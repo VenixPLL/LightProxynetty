@@ -90,6 +90,7 @@ public class ServerConnector implements IConnector {
                                     close();
                                 }else if(packet instanceof ServerLoginSuccessPacket){
                                     setConnectionState(EnumConnectionState.PLAY);
+                                    owner.sendChatMessage("&aLogged in!");
                                 }else if(packet instanceof ServerJoinGamePacket) {
                                     WorldUtils.dimSwitch(owner, (ServerJoinGamePacket) packet);
                                     connected = true;

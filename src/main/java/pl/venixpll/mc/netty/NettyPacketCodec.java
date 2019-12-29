@@ -1,5 +1,6 @@
 package pl.venixpll.mc.netty;
 
+import com.google.common.primitives.Bytes;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;

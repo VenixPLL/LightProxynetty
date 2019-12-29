@@ -3,6 +3,7 @@ package pl.venixpll.system.command;
 import pl.venixpll.mc.objects.Player;
 import pl.venixpll.system.command.impl.CommandHelp;
 import pl.venixpll.system.command.impl.CommandJoin;
+import pl.venixpll.system.command.impl.CommandNBT;
 import pl.venixpll.system.command.impl.CommandQuit;
 import pl.venixpll.utils.LogUtil;
 
@@ -18,6 +19,7 @@ public class CommandManager  {
         commands.add(new CommandHelp());
         commands.add(new CommandJoin());
         commands.add(new CommandQuit());
+        commands.add(new CommandNBT());
     }
 
     public static void onCommand(final String message, final Player sender){

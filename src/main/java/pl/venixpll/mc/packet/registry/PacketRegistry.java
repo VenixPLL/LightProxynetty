@@ -6,6 +6,7 @@ import pl.venixpll.mc.data.network.EnumPacketDirection;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.impl.client.login.ClientLoginStartPacket;
 import pl.venixpll.mc.packet.impl.client.play.ClientChatPacket;
+import pl.venixpll.mc.packet.impl.client.play.ClientCreativeInventoryAction;
 import pl.venixpll.mc.packet.impl.client.play.ClientKeepAlivePacket;
 import pl.venixpll.mc.packet.impl.client.status.ClientStatusPingPacket;
 import pl.venixpll.mc.packet.impl.client.status.ClientStatusRequestPacket;
@@ -79,7 +80,7 @@ public class PacketRegistry {
             //PLAY
         registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.SERVERBOUND,new ClientKeepAlivePacket());
         registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.SERVERBOUND,new ClientChatPacket());
-
+        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.SERVERBOUND,new ClientCreativeInventoryAction());
         //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER
             //STATUS
         registerPacket(EnumConnectionState.STATUS,EnumPacketDirection.CLIENTBOUND,new ServerStatusResponsePacket());
