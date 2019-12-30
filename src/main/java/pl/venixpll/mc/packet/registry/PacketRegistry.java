@@ -17,10 +17,8 @@ import pl.venixpll.mc.packet.impl.server.login.ServerLoginSuccessPacket;
 import pl.venixpll.mc.packet.impl.server.play.ServerDisconnectPacket;
 import pl.venixpll.mc.packet.impl.server.play.ServerJoinGamePacket;
 import pl.venixpll.mc.packet.impl.server.play.ServerKeepAlivePacket;
-import pl.venixpll.mc.packet.impl.server.play.ServerPlayerAbilitiesPacket;
 import pl.venixpll.mc.packet.impl.server.status.ServerStatusPongPacket;
 import pl.venixpll.mc.packet.impl.server.status.ServerStatusResponsePacket;
-import pl.venixpll.utils.LogUtil;
 
 import java.util.HashMap;
 
@@ -34,7 +32,7 @@ public class PacketRegistry {
     private static HashMap<Integer,Packet> SERVER_LOGIN = new HashMap<>();
     private static HashMap<Integer,Packet> SERVER_PLAY = new HashMap<>();
 
-    private static void registerPacket(EnumConnectionState connectionState, EnumPacketDirection direction, Packet packet){
+    public static void registerPacket(EnumConnectionState connectionState, EnumPacketDirection direction, Packet packet){
         final int packetId = packet.getPacketID();
         switch(direction){
             case SERVERBOUND:

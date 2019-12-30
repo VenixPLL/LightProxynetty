@@ -40,6 +40,14 @@ public class NetHandlerPlayServer implements INetHandler {
 
     private void forwardPacket(final Packet packet){
         if(player.getConnector() != null && player.getConnector().isConnected()){
+            if(player.isMother()){
+                player.getBots().forEach(bot -> {
+                    if(bot.getConnection().isConnected()) {
+                        //TODO add Entity Action exclude;
+                        bot.getConnection().sendPacket(packet);
+                    }
+                });
+            }
             player.getConnector().sendPacket(packet);
         }
     }

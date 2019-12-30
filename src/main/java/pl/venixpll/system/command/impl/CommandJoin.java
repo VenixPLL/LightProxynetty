@@ -68,7 +68,7 @@ public class CommandJoin extends Command {
         }
 
         if(ping){
-            final ServerPinger pinger = new ServerPinger(sender,connector);
+            final ServerPinger pinger = new ServerPinger(sender,true,connector);
             pinger.connect(host,port, proxy);
         }else{
             connector.connect(host,port,proxy);

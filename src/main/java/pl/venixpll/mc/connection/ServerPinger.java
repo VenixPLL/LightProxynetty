@@ -24,12 +24,14 @@ import pl.venixpll.mc.packet.impl.server.status.ServerStatusResponsePacket;
 import pl.venixpll.utils.LazyLoadBase;
 
 import java.net.Proxy;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Data
 public class ServerPinger implements IConnector{
 
     private final Player owner;
+    private final boolean showResult;
     private final IConnector otherConnection;
 
     private Channel channel;
@@ -59,7 +61,10 @@ public class ServerPinger implements IConnector{
                         pipeline.addLast("handler", new SimpleChannelInboundHandler<Packet>() {
                             @Override
                             public void channelActive(ChannelHandlerContext ctx) throws Exception {
-                                owner.sendChatMessage("&aPinging...");
+                                if(showResult) {
+                                    owner.sendChatMessage("&aPinging...");
+                                }
+                                TimeUnit.MILLISECONDS.sleep(150);
                                 sendPacket(new HandshakePacket(47,host,port,1));
                                 sendPacket(new ClientStatusRequestPacket());
                             }
@@ -67,10 +72,12 @@ public class ServerPinger implements IConnector{
                             @Override
                             protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
                                 if(packet instanceof ServerStatusResponsePacket){
-                                    final ServerStatusInfo info = ((ServerStatusResponsePacket) packet).getStatusInfo();
-                                    owner.sendChatMessage("&6Online&8: &7%s&8/&7%s",info.getPlayers().getOnlinePlayers(),info.getPlayers().getMaxPlayers());
-                                    owner.sendChatMessage("&6Motd&8: &f" + info.getDescription().getFullText());
-                                    owner.sendChatMessage("&6Version&8: &6%s &8(&f%s&8)",info.getVersion().getProtocol(),info.getVersion().getName());
+                                    if(showResult) {
+                                        final ServerStatusInfo info = ((ServerStatusResponsePacket) packet).getStatusInfo();
+                                        owner.sendChatMessage("&6Online&8: &7%s&8/&7%s", info.getPlayers().getOnlinePlayers(), info.getPlayers().getMaxPlayers());
+                                        owner.sendChatMessage("&6Motd&8: &f" + info.getDescription().getFullText());
+                                        owner.sendChatMessage("&6Version&8: &6%s &8(&f%s&8)", info.getVersion().getProtocol(), info.getVersion().getName());
+                                    }
                                     channel.close();
                                     if(otherConnection != null){
                                         otherConnection.connect(host,port,proxy);

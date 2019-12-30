@@ -1,5 +1,6 @@
 package pl.venixpll.mc.server;
 
+import com.darkmagician6.eventapi.EventManager;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -10,6 +11,8 @@ import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import pl.venixpll.events.PlayerConnectedEvent;
+import pl.venixpll.events.PlayerDisconnectedEvent;
 import pl.venixpll.mc.data.network.EnumConnectionState;
 import pl.venixpll.mc.data.network.EnumPacketDirection;
 import pl.venixpll.mc.data.status.ServerStatusInfo;
@@ -65,11 +68,15 @@ public class MinecraftServer {
                                 super.channelActive(ctx);
                                 player.setUsername(ctx.channel().remoteAddress().toString());
                                 player.setChannel(ctx.channel());
+                                final PlayerConnectedEvent event = new PlayerConnectedEvent(player);
+                                EventManager.call(event);
                             }
 
                             @Override
                             public void channelInactive(ChannelHandlerContext ctx) throws Exception {
                                 super.channelInactive(ctx);
+                                final PlayerDisconnectedEvent event = new PlayerDisconnectedEvent(player);
+                                EventManager.call(event);
                                 player.disconnected();
                             }
 

@@ -1,9 +1,11 @@
 package pl.venixpll.mc.objects;
 
+import com.darkmagician6.eventapi.EventManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import lombok.Data;
 import pl.venixpll.LightProxy;
+import pl.venixpll.events.PacketReceivedEvent;
 import pl.venixpll.mc.connection.ServerConnector;
 import pl.venixpll.mc.data.network.EnumConnectionState;
 import pl.venixpll.mc.netty.NettyCompressionCodec;
@@ -29,6 +31,8 @@ public class Player {
     private int ping;
     private ServerConnector connector;
 
+    private boolean mother;
+
     private List<Bot> bots = new ArrayList<>();
 
     public void sendChatMessage(final String message,final Object... args){
@@ -36,24 +40,28 @@ public class Player {
     }
 
     public void packetReceived(final Packet packet){
-        if(packet instanceof HandshakePacket){
-            final HandshakePacket handshake = (HandshakePacket) packet;
-            switch(handshake.getNextState()){
-                case 1:
-                    setConnectionState(EnumConnectionState.STATUS);
-                    packetHandler = new NetHandlerStatusServer(this);
-                    break;
-                case 2:
-                    setConnectionState(EnumConnectionState.LOGIN);
-                    packetHandler = new NetHandlerLoginServer(this);
-                    break;
+        final PacketReceivedEvent event = new PacketReceivedEvent(packet,this);
+        EventManager.call(event);
+        if(!event.isCancelled()) {
+            if (packet instanceof HandshakePacket) {
+                final HandshakePacket handshake = (HandshakePacket) packet;
+                switch (handshake.getNextState()) {
+                    case 1:
+                        setConnectionState(EnumConnectionState.STATUS);
+                        packetHandler = new NetHandlerStatusServer(this);
+                        break;
+                    case 2:
+                        setConnectionState(EnumConnectionState.LOGIN);
+                        packetHandler = new NetHandlerLoginServer(this);
+                        break;
+                }
+                if (connectionState == EnumConnectionState.HANDSHAKE) {
+                    channel.close();
+                    return;
+                }
+            } else {
+                packetHandler.handlePacket(packet);
             }
-            if(connectionState == EnumConnectionState.HANDSHAKE){
-                channel.close();
-                return;
-            }
-        }else{
-            packetHandler.handlePacket(packet);
         }
     }
 

@@ -1,5 +1,6 @@
 package pl.venixpll.mc.connection;
 
+import com.darkmagician6.eventapi.EventManager;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -10,39 +11,34 @@ import io.netty.handler.proxy.Socks4ProxyHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import pl.venixpll.events.BotConnectedEvent;
+import pl.venixpll.events.PacketReceivedEvent;
 import pl.venixpll.mc.data.network.EnumConnectionState;
 import pl.venixpll.mc.data.network.EnumPacketDirection;
 import pl.venixpll.mc.netty.NettyCompressionCodec;
 import pl.venixpll.mc.netty.NettyPacketCodec;
 import pl.venixpll.mc.netty.NettyVarInt21FrameCodec;
-import pl.venixpll.mc.objects.Player;
+import pl.venixpll.mc.objects.Bot;
 import pl.venixpll.mc.packet.Packet;
-import pl.venixpll.mc.packet.impl.CustomPacket;
 import pl.venixpll.mc.packet.impl.client.login.ClientLoginStartPacket;
 import pl.venixpll.mc.packet.impl.client.play.ClientKeepAlivePacket;
 import pl.venixpll.mc.packet.impl.handshake.HandshakePacket;
-import pl.venixpll.mc.packet.impl.server.login.ServerLoginEncryptionRequestPacket;
 import pl.venixpll.mc.packet.impl.server.login.ServerLoginSetCompressionPacket;
 import pl.venixpll.mc.packet.impl.server.login.ServerLoginSuccessPacket;
-import pl.venixpll.mc.packet.impl.server.play.ServerDisconnectPacket;
-import pl.venixpll.mc.packet.impl.server.play.ServerJoinGamePacket;
 import pl.venixpll.mc.packet.impl.server.play.ServerKeepAlivePacket;
 import pl.venixpll.utils.LazyLoadBase;
-import pl.venixpll.utils.WorldUtils;
 
 import java.net.Proxy;
 import java.util.concurrent.TimeUnit;
 
-@RequiredArgsConstructor
 @Data
-public class ServerConnector implements IConnector {
-
-    private final Player owner;
-    private final String username;
+@RequiredArgsConstructor
+public class BotConnection implements IConnector {
 
     private Channel channel;
     private EnumConnectionState connectionState = EnumConnectionState.LOGIN;
     private boolean connected;
+    private final Bot owner;
 
     private final LazyLoadBase<NioEventLoopGroup> CLIENT_NIO_EVENT_LOOP_PING = new LazyLoadBase<NioEventLoopGroup>() {
         @Override
@@ -69,44 +65,32 @@ public class ServerConnector implements IConnector {
                         pipeline.addLast("handler", new SimpleChannelInboundHandler<Packet>() {
                             @Override
                             public void channelActive(ChannelHandlerContext ctx) throws Exception {
-                                owner.sendChatMessage("&aConnecting...");
-                                TimeUnit.MILLISECONDS.sleep(150);
-                                sendPacket(new HandshakePacket(47,"",25565,2));
-                                sendPacket(new ClientLoginStartPacket(username));
+                                final BotConnectedEvent event = new BotConnectedEvent(owner);
+                                EventManager.call(event);
+                                if(!event.isCancelled()) {
+                                    TimeUnit.MILLISECONDS.sleep(150);
+                                    sendPacket(new HandshakePacket(47, "", 25565, 2));
+                                    sendPacket(new ClientLoginStartPacket(owner.getUsername()));
+                                }
                             }
 
                             @Override
                             public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-                                if(connected){
-                                    owner.sendChatMessage("&cServer disconnected directly!");
-                                }
                                 connected = false;
+                                owner.disconnected();
                             }
 
                             @Override
                             protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
-                                if(packet instanceof ServerLoginSetCompressionPacket) {
+                                if(packet instanceof ServerLoginSetCompressionPacket){
                                     setCompressionThreshold(((ServerLoginSetCompressionPacket) packet).getThreshold());
-                                }else if(packet instanceof ServerLoginEncryptionRequestPacket){
-                                    owner.sendChatMessage("&cProxy does not support Minecraft Premium!");
-                                    close();
                                 }else if(packet instanceof ServerLoginSuccessPacket){
                                     setConnectionState(EnumConnectionState.PLAY);
-                                    owner.sendChatMessage("&aLogged in!");
-                                }else if(packet instanceof ServerJoinGamePacket) {
-                                    WorldUtils.dimSwitch(owner, (ServerJoinGamePacket) packet);
                                     connected = true;
-                                    owner.sendChatMessage("&aConnected!");
-                                }else if(packet instanceof ServerDisconnectPacket) {
-                                    connected = false;
-                                    WorldUtils.emptyWorld(owner);
-                                    owner.sendChatMessage("&cDisconnected!");
-                                    owner.sendChatMessage("&f" + ((ServerDisconnectPacket) packet).getReason().getFullText());
                                 }else if(packet instanceof ServerKeepAlivePacket){
                                     sendPacket(new ClientKeepAlivePacket(((ServerKeepAlivePacket) packet).getKeepaliveId()));
-                                }else if(connected && connectionState == EnumConnectionState.PLAY){
-                                    owner.sendPacket(packet);
                                 }
+                                owner.packetReceived(packet);
                             }
                         });
                     }
@@ -139,6 +123,7 @@ public class ServerConnector implements IConnector {
     }
 
     public void sendPacket(final Packet packet){
-        this.channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+        channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
     }
+
 }
