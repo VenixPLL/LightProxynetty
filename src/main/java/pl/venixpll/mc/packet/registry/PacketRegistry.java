@@ -5,18 +5,18 @@ import pl.venixpll.mc.data.network.EnumConnectionState;
 import pl.venixpll.mc.data.network.EnumPacketDirection;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.impl.client.login.ClientLoginStartPacket;
-import pl.venixpll.mc.packet.impl.client.play.ClientChatPacket;
-import pl.venixpll.mc.packet.impl.client.play.ClientCreativeInventoryAction;
-import pl.venixpll.mc.packet.impl.client.play.ClientKeepAlivePacket;
+import pl.venixpll.mc.packet.impl.client.play.*;
 import pl.venixpll.mc.packet.impl.client.status.ClientStatusPingPacket;
 import pl.venixpll.mc.packet.impl.client.status.ClientStatusRequestPacket;
 import pl.venixpll.mc.packet.impl.handshake.HandshakePacket;
+import pl.venixpll.mc.packet.impl.server.login.ServerLoginDisconnectPacket;
 import pl.venixpll.mc.packet.impl.server.login.ServerLoginEncryptionRequestPacket;
 import pl.venixpll.mc.packet.impl.server.login.ServerLoginSetCompressionPacket;
 import pl.venixpll.mc.packet.impl.server.login.ServerLoginSuccessPacket;
 import pl.venixpll.mc.packet.impl.server.play.ServerDisconnectPacket;
 import pl.venixpll.mc.packet.impl.server.play.ServerJoinGamePacket;
 import pl.venixpll.mc.packet.impl.server.play.ServerKeepAlivePacket;
+import pl.venixpll.mc.packet.impl.server.play.ServerTimeUpdatePacket;
 import pl.venixpll.mc.packet.impl.server.status.ServerStatusPongPacket;
 import pl.venixpll.mc.packet.impl.server.status.ServerStatusResponsePacket;
 
@@ -79,11 +79,14 @@ public class PacketRegistry {
         registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.SERVERBOUND,new ClientKeepAlivePacket());
         registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.SERVERBOUND,new ClientChatPacket());
         registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.SERVERBOUND,new ClientCreativeInventoryAction());
+        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.SERVERBOUND,new ClientEntityActionPacket());
+        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.SERVERBOUND,new ClientPluginMessagePacket());
         //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER
             //STATUS
         registerPacket(EnumConnectionState.STATUS,EnumPacketDirection.CLIENTBOUND,new ServerStatusResponsePacket());
         registerPacket(EnumConnectionState.STATUS,EnumPacketDirection.CLIENTBOUND,new ServerStatusPongPacket());
             //LOGIN
+        registerPacket(EnumConnectionState.LOGIN,EnumPacketDirection.CLIENTBOUND,new ServerLoginDisconnectPacket());
         registerPacket(EnumConnectionState.LOGIN,EnumPacketDirection.CLIENTBOUND,new ServerLoginSetCompressionPacket());
         registerPacket(EnumConnectionState.LOGIN,EnumPacketDirection.CLIENTBOUND,new ServerLoginEncryptionRequestPacket());
         registerPacket(EnumConnectionState.LOGIN,EnumPacketDirection.CLIENTBOUND,new ServerLoginSuccessPacket());
@@ -91,6 +94,7 @@ public class PacketRegistry {
         registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.CLIENTBOUND,new ServerJoinGamePacket());// 0x01
         registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.CLIENTBOUND,new ServerKeepAlivePacket());// 0x00
         registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.CLIENTBOUND,new ServerDisconnectPacket());
+        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.CLIENTBOUND,new ServerTimeUpdatePacket());
     }
 
     public static Packet getPacket(EnumConnectionState connectionState, EnumPacketDirection direction, int id){

@@ -21,22 +21,7 @@ public class BotManager {
                 for (int i = 0; i < amount; i++) {
                     final String username = (usernames + i);
 
-                    Proxy foundProxy;
-                    final String pString = proxy;
-                    if(pString.equalsIgnoreCase("none")){
-                        foundProxy = Proxy.NO_PROXY;
-                    }else if(pString.equalsIgnoreCase("PL")){
-                        foundProxy = LightProxy.PLChecker.BEST_PROXIES.get(Util.random.nextInt(LightProxy.PLChecker.BEST_PROXIES.size()));
-                    }else if(pString.equalsIgnoreCase("GL")){
-                        foundProxy = LightProxy.GLChecker.BEST_PROXIES.get(Util.random.nextInt(LightProxy.GLChecker.BEST_PROXIES.size()));
-                    }else{
-                        if(pString.contains(":")){
-                            final String[] sp = pString.split(":",2);
-                            foundProxy = new Proxy(Proxy.Type.SOCKS,new InetSocketAddress(sp[0],Integer.parseInt(sp[1])));
-                        }else{
-                            throw new Exception();
-                        }
-                    }
+                    final Proxy foundProxy = Util.getProxyByName(proxy);
                     final Bot bot = new Bot(username,sender);
                     if(ping){
                         final ServerPinger pinger = new ServerPinger(sender,false,bot.getConnection());

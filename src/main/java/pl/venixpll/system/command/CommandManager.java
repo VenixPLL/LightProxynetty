@@ -22,6 +22,8 @@ public class CommandManager  {
         commands.add(new CommandJoinBot());
         commands.add(new CommandMother());
         commands.add(new CommandBroadcast());
+        commands.add(new CommandTps());
+        commands.add(new CommandRespawn());
     }
 
     public static void registerCommand(final Command command){

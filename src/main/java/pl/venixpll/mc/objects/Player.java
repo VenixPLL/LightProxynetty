@@ -7,6 +7,7 @@ import lombok.Data;
 import pl.venixpll.LightProxy;
 import pl.venixpll.events.PacketReceivedEvent;
 import pl.venixpll.mc.connection.ServerConnector;
+import pl.venixpll.mc.data.game.TitleAction;
 import pl.venixpll.mc.data.network.EnumConnectionState;
 import pl.venixpll.mc.netty.NettyCompressionCodec;
 import pl.venixpll.mc.netty.NettyPacketCodec;
@@ -17,6 +18,7 @@ import pl.venixpll.mc.packet.impl.client.NetHandlerStatusServer;
 import pl.venixpll.mc.packet.impl.handshake.HandshakePacket;
 import pl.venixpll.mc.packet.impl.server.login.ServerLoginSetCompressionPacket;
 import pl.venixpll.mc.packet.impl.server.play.ServerChatPacket;
+import pl.venixpll.mc.packet.impl.server.play.ServerTitlePacket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,16 @@ public class Player {
     private boolean mother;
 
     private List<Bot> bots = new ArrayList<>();
+
+    public void resetTitle(){
+        sendPacket(new ServerTitlePacket(TitleAction.RESET));
+    }
+
+    public void sendTitle(final String header,final String footer){
+        if(header != null) sendPacket(new ServerTitlePacket(TitleAction.TITLE,header));
+        if(footer != null) sendPacket(new ServerTitlePacket(TitleAction.SUBTITLE,footer));
+        sendPacket(new ServerTitlePacket(TitleAction.TIMES,10,10,10));
+    }
 
     public void sendChatMessage(final String message,final Object... args){
         sendPacket(new ServerChatPacket("&fLight&6Proxy &8» &6" + String.format(message,args)));

@@ -1,6 +1,9 @@
 package pl.venixpll.utils;
 
 
+import pl.venixpll.mc.packet.Packet;
+import pl.venixpll.mc.packet.impl.CustomPacket;
+
 import javax.naming.directory.Attributes;
 import javax.naming.directory.InitialDirContext;
 import java.net.InetSocketAddress;
@@ -48,6 +51,12 @@ public class NetUtils {
         } catch (final Throwable var6) {
             return new String[] {p_78863_0_, Integer.toString(25565)};
         }
+    }
+
+    public static Packet createPacket(final int id, final byte[] data){
+        final Packet packet = new CustomPacket();
+        packet.setCustom(id,data);
+        return packet;
     }
 
 }

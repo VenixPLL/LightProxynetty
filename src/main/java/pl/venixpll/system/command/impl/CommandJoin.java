@@ -42,23 +42,7 @@ public class CommandJoin extends Command {
         final ServerConnector connector = new ServerConnector(sender,username);
         sender.setConnector(connector);
 
-        Proxy proxy = Proxy.NO_PROXY;
-        final String pString = args[4];
-
-        if(pString.equalsIgnoreCase("none")){
-            proxy = Proxy.NO_PROXY;
-        }else if(pString.equalsIgnoreCase("PL")){
-            proxy = LightProxy.PLChecker.BEST_PROXIES.get(Util.random.nextInt(LightProxy.PLChecker.BEST_PROXIES.size()));
-        }else if(pString.equalsIgnoreCase("GL")){
-            proxy = LightProxy.GLChecker.BEST_PROXIES.get(Util.random.nextInt(LightProxy.GLChecker.BEST_PROXIES.size()));
-        }else{
-            if(pString.contains(":")){
-                final String[] sp = pString.split(":",2);
-                proxy = new Proxy(Proxy.Type.SOCKS,new InetSocketAddress(sp[0],Integer.parseInt(sp[1])));
-            }else{
-                throw new Exception();
-            }
-        }
+        final Proxy proxy = Util.getProxyByName(args[4]);
 
         if(proxy != Proxy.NO_PROXY) {
             if (NetUtils.checkProxy(proxy, 300) == -1) {

@@ -35,7 +35,7 @@ public class CommandJoinBot extends Command {
         final int delay = Integer.parseInt(args[4]);
         final boolean doPing = Boolean.parseBoolean(args[5]);
         final String proxy = args[6];
-        sender.sendChatMessage("&aWysylam!");
+        sender.sendChatMessage("&aSending!");
         BotManager.connectSome(host,port,usernames,amount,delay,doPing,proxy,sender);
     }
 }

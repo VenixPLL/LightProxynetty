@@ -21,16 +21,20 @@ import pl.venixpll.mc.packet.impl.CustomPacket;
 import pl.venixpll.mc.packet.impl.client.login.ClientLoginStartPacket;
 import pl.venixpll.mc.packet.impl.client.play.ClientKeepAlivePacket;
 import pl.venixpll.mc.packet.impl.handshake.HandshakePacket;
+import pl.venixpll.mc.packet.impl.server.login.ServerLoginDisconnectPacket;
 import pl.venixpll.mc.packet.impl.server.login.ServerLoginEncryptionRequestPacket;
 import pl.venixpll.mc.packet.impl.server.login.ServerLoginSetCompressionPacket;
 import pl.venixpll.mc.packet.impl.server.login.ServerLoginSuccessPacket;
 import pl.venixpll.mc.packet.impl.server.play.ServerDisconnectPacket;
 import pl.venixpll.mc.packet.impl.server.play.ServerJoinGamePacket;
 import pl.venixpll.mc.packet.impl.server.play.ServerKeepAlivePacket;
+import pl.venixpll.mc.packet.impl.server.play.ServerTimeUpdatePacket;
 import pl.venixpll.utils.LazyLoadBase;
+import pl.venixpll.utils.WaitTimer;
 import pl.venixpll.utils.WorldUtils;
 
 import java.net.Proxy;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
@@ -43,6 +47,10 @@ public class ServerConnector implements IConnector {
     private Channel channel;
     private EnumConnectionState connectionState = EnumConnectionState.LOGIN;
     private boolean connected;
+
+    private final ArrayList<Long> tpstimes = new ArrayList<>();
+    private double lastTps;
+    private final WaitTimer tpsTimer = new WaitTimer();
 
     private final LazyLoadBase<NioEventLoopGroup> CLIENT_NIO_EVENT_LOOP_PING = new LazyLoadBase<NioEventLoopGroup>() {
         @Override
@@ -71,7 +79,7 @@ public class ServerConnector implements IConnector {
                             public void channelActive(ChannelHandlerContext ctx) throws Exception {
                                 owner.sendChatMessage("&aConnecting...");
                                 TimeUnit.MILLISECONDS.sleep(150);
-                                sendPacket(new HandshakePacket(47,"",25565,2));
+                                sendPacket(new HandshakePacket(47,"",port,2));
                                 sendPacket(new ClientLoginStartPacket(username));
                             }
 
@@ -102,9 +110,26 @@ public class ServerConnector implements IConnector {
                                     WorldUtils.emptyWorld(owner);
                                     owner.sendChatMessage("&cDisconnected!");
                                     owner.sendChatMessage("&f" + ((ServerDisconnectPacket) packet).getReason().getFullText());
+                                }else if(packet instanceof ServerLoginDisconnectPacket){
+                                    connected = false;
+                                    owner.sendChatMessage("&cDisconnected during login!");
+                                    owner.sendChatMessage("&f" + ((ServerDisconnectPacket) packet).getReason().getFullText());
                                 }else if(packet instanceof ServerKeepAlivePacket){
                                     sendPacket(new ClientKeepAlivePacket(((ServerKeepAlivePacket) packet).getKeepaliveId()));
                                 }else if(connected && connectionState == EnumConnectionState.PLAY){
+                                    if(packet instanceof ServerTimeUpdatePacket) {
+                                        tpstimes.add(Math.max(1000, tpsTimer.getTime()));
+                                        long timesAdded = 0;
+                                        if (tpstimes.size() > 5) {
+                                            tpstimes.remove(0);
+                                        }
+                                        for (long l : tpstimes) {
+                                            timesAdded += l;
+                                        }
+                                        long roundedTps = timesAdded / tpstimes.size();
+                                        lastTps = (20.0 / roundedTps) * 1000.0;
+                                        tpsTimer.reset();
+                                    }
                                     owner.sendPacket(packet);
                                 }
                             }

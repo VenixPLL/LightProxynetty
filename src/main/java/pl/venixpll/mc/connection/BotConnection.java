@@ -69,7 +69,7 @@ public class BotConnection implements IConnector {
                                 EventManager.call(event);
                                 if(!event.isCancelled()) {
                                     TimeUnit.MILLISECONDS.sleep(150);
-                                    sendPacket(new HandshakePacket(47, "", 25565, 2));
+                                    sendPacket(new HandshakePacket(47, "", port, 2));
                                     sendPacket(new ClientLoginStartPacket(owner.getUsername()));
                                 }
                             }
