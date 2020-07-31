@@ -5,6 +5,7 @@ import pl.venixpll.events.PlayerCommandEvent;
 import pl.venixpll.mc.objects.Player;
 import pl.venixpll.system.command.Command;
 import pl.venixpll.system.command.CommandManager;
+import pl.venixpll.system.crash.impl.CrashBasic;
 import pl.venixpll.utils.LogUtil;
 
 import java.util.ArrayList;
@@ -16,16 +17,17 @@ public class CrashRegistry {
     private static List<Crash> crashList = new ArrayList<>();
 
     public static void init(){
-        CommandManager.registerCommand(new Command(",crash","Zzzz","<method,list>") {
+        CommandManager.registerCommand(new Command(",crash","Zzzz","<method,list> <mArgs>") {
             @Override
             public void onExecute(String cmd, Player sender) throws Exception {
-                if(sender.getConnector().isConnected()){
-                    execute(cmd,sender);
-                }else{
-                    sender.sendChatMessage("&cYou have to be connected!");
+                try {
+                    execute(cmd, sender);
+                }catch(final Throwable t){
+                    t.printStackTrace();
                 }
             }
         });
+        registerCrash(new CrashBasic(),false);
         crashList.forEach(c -> c.init());
         LogUtil.printMessage("Loaded %s crashers!",crashList.size());
     }
@@ -40,16 +42,21 @@ public class CrashRegistry {
         if(args[1].equalsIgnoreCase("list")){
             crashList.forEach(c -> sender.sendChatMessage("&c,crash %s <amount> &8- &6%s",c.getName(),c.getCrashType().name()));
         }else {
-            final Optional<Crash> crashOptional = crashList.stream().filter(c -> c.getName().equalsIgnoreCase(args[1])).findFirst();
-            if (crashOptional.isPresent()) {
-                try {
-                    crashOptional.get().execute(message, sender);
-                } catch (final Exception exc) {
-                    sender.sendChatMessage("&cError during crashing current server!");
+            if (sender.getConnector() != null && sender.getConnector().isConnected()) {
+
+                final Optional<Crash> crashOptional = crashList.stream().filter(c -> c.getName().equalsIgnoreCase(args[1])).findFirst();
+                if (crashOptional.isPresent()) {
+                    try {
+                        crashOptional.get().execute(message, sender);
+                    } catch (final Exception exc) {
+                        sender.sendChatMessage("&cError during crashing current server!");
+                    }
+                } else {
+                    sender.sendChatMessage("&cCrash method not found!");
+                    sender.sendChatMessage("&cUse \"crash list\" for list of methods!");
                 }
-            } else {
-                sender.sendChatMessage("&cCrash method not found!");
-                sender.sendChatMessage("&cUse \"crash list\" for list of methods!");
+            }else{
+                sender.sendChatMessage("&cYou have to be connected!");
             }
         }
     }

@@ -20,6 +20,7 @@ import pl.venixpll.mc.packet.impl.server.play.ServerTimeUpdatePacket;
 import pl.venixpll.mc.packet.impl.server.status.ServerStatusPongPacket;
 import pl.venixpll.mc.packet.impl.server.status.ServerStatusResponsePacket;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 
 public class PacketRegistry {
@@ -97,7 +98,12 @@ public class PacketRegistry {
         registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.CLIENTBOUND,new ServerTimeUpdatePacket());
     }
 
+
     public static Packet getPacket(EnumConnectionState connectionState, EnumPacketDirection direction, int id){
+        return getNewInstance(getPacketA(connectionState,direction,id));
+    }
+
+    private static Packet getPacketA(EnumConnectionState connectionState, EnumPacketDirection direction, int id){
         switch(direction){
             case SERVERBOUND:
                 switch(connectionState){
@@ -124,6 +130,21 @@ public class PacketRegistry {
                 break;
         }
         return null;
+    }
+
+    private static Packet getNewInstance(final Packet packetIn){
+        if(packetIn == null) return null;
+        Class<? extends Packet> packet = packetIn.getClass();
+        try {
+            Constructor<? extends Packet> constructor = packet.getDeclaredConstructor();
+            if (!constructor.isAccessible()) {
+                constructor.setAccessible(true);
+            }
+
+            return constructor.newInstance();
+        }catch(Exception e) {
+            throw new IllegalStateException("Failed to instantiate packet \"" + packetIn.getPacketID() + ", " + packet.getName() + "\".", e);
+        }
     }
 
 }
