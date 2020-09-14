@@ -52,6 +52,8 @@ public class ServerConnector implements IConnector {
     private double lastTps;
     private final WaitTimer tpsTimer = new WaitTimer();
 
+    private long lastPacketTime = 0L;
+
     private final LazyLoadBase<NioEventLoopGroup> CLIENT_NIO_EVENT_LOOP_PING = new LazyLoadBase<NioEventLoopGroup>() {
         @Override
         protected NioEventLoopGroup load() {
@@ -130,6 +132,7 @@ public class ServerConnector implements IConnector {
                                         lastTps = (20.0 / roundedTps) * 1000.0;
                                         tpsTimer.reset();
                                     }
+                                    lastPacketTime = System.currentTimeMillis();
                                     owner.sendPacket(packet);
                                 }
                             }

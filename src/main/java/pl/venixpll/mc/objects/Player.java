@@ -42,9 +42,22 @@ public class Player {
     }
 
     public void sendTitle(final String header,final String footer){
+        this.sendTitle(header,footer,10,10,10);
+    }
+
+    public void sendTitle(final String header,final String footer,final int fadeIn,final int stay,final int fadeOut){
         if(header != null) sendPacket(new ServerTitlePacket(TitleAction.TITLE,header));
         if(footer != null) sendPacket(new ServerTitlePacket(TitleAction.SUBTITLE,footer));
-        sendPacket(new ServerTitlePacket(TitleAction.TIMES,10,10,10));
+        sendPacket(new ServerTitlePacket(TitleAction.TIMES,fadeIn,stay,fadeOut));
+    }
+
+    public final void tick(){
+        if(this.getConnector() != null && this.getConnector().isConnected()){
+            final int packetTime = (int) (System.currentTimeMillis() - this.getConnector().getLastPacketTime());
+            if(packetTime > 2000){
+                sendTitle("&cServer is not responding!",String.format("&6%sms",packetTime),0,10,0);
+            }
+        }
     }
 
     public void sendChatMessage(final String message,final Object... args){

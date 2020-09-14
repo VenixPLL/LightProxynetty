@@ -24,6 +24,7 @@ import pl.venixpll.mc.packet.impl.server.play.ServerKeepAlivePacket;
 import pl.venixpll.mc.packet.registry.PacketRegistry;
 import pl.venixpll.utils.LazyLoadBase;
 import pl.venixpll.utils.LogUtil;
+import pl.venixpll.utils.WaitTimer;
 
 import java.util.List;
 import java.util.concurrent.*;
@@ -88,11 +89,19 @@ public class MinecraftServer {
                     }
                 }).bind(port).addListener((ChannelFutureListener) channelFuture -> LogUtil.printMessage(successMessage,port));
         final ScheduledExecutorService keepAliveTask = Executors.newSingleThreadScheduledExecutor();
+
+        final WaitTimer keepAliveTimer = new WaitTimer();
+
         keepAliveTask.scheduleAtFixedRate(() -> {
+            if (keepAliveTimer.hasTimeElapsed(3000, true)) {
+                this.playerList.stream().filter(p -> p.getConnectionState() == EnumConnectionState.PLAY).collect(Collectors.toList()).forEach(p -> {
+                    p.sendPacket(new ServerKeepAlivePacket((int)System.currentTimeMillis()));
+                });
+            }
             this.playerList.stream().filter(p -> p.getConnectionState() == EnumConnectionState.PLAY).collect(Collectors.toList()).forEach(p -> {
-                p.sendPacket(new ServerKeepAlivePacket((int)System.currentTimeMillis()));
+                p.tick();
             });
-        },3,3, TimeUnit.SECONDS);
+        },50,50, TimeUnit.MILLISECONDS);
         return this;
     }
 
