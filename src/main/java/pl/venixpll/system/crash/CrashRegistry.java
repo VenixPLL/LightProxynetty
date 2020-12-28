@@ -6,6 +6,7 @@ import pl.venixpll.mc.objects.Player;
 import pl.venixpll.system.command.Command;
 import pl.venixpll.system.command.CommandManager;
 import pl.venixpll.system.crash.impl.CrashBasic;
+import pl.venixpll.system.crash.impl.CrashBasic2;
 import pl.venixpll.utils.LogUtil;
 
 import java.util.ArrayList;
@@ -28,7 +29,8 @@ public class CrashRegistry {
             }
         });
         registerCrash(new CrashBasic(),false);
-        crashList.forEach(c -> c.init());
+        registerCrash(new CrashBasic2(),false);
+        crashList.forEach(Crash::init);
         LogUtil.printMessage("Loaded %s crashers!",crashList.size());
     }
 
