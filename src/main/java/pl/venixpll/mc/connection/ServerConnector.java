@@ -115,7 +115,7 @@ public class ServerConnector implements IConnector {
                                 }else if(packet instanceof ServerLoginDisconnectPacket){
                                     connected = false;
                                     owner.sendChatMessage("&cDisconnected during login!");
-                                    owner.sendChatMessage("&f" + ((ServerDisconnectPacket) packet).getReason().getFullText());
+                                    owner.sendChatMessage("&f" + ((ServerLoginDisconnectPacket) packet).getReason().getFullText());
                                 }else if(packet instanceof ServerKeepAlivePacket){
                                     sendPacket(new ClientKeepAlivePacket(((ServerKeepAlivePacket) packet).getKeepaliveId()));
                                 }else if(connected && connectionState == EnumConnectionState.PLAY){
