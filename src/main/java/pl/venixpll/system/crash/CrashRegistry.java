@@ -1,12 +1,9 @@
 package pl.venixpll.system.crash;
 
-import com.darkmagician6.eventapi.EventManager;
-import pl.venixpll.events.PlayerCommandEvent;
 import pl.venixpll.mc.objects.Player;
 import pl.venixpll.system.command.Command;
 import pl.venixpll.system.command.CommandManager;
-import pl.venixpll.system.crash.impl.CrashBasic;
-import pl.venixpll.system.crash.impl.CrashBasic2;
+import pl.venixpll.system.crash.impl.*;
 import pl.venixpll.utils.LogUtil;
 
 import java.util.ArrayList;
@@ -30,6 +27,12 @@ public class CrashRegistry {
         });
         registerCrash(new CrashBasic(),false);
         registerCrash(new CrashBasic2(),false);
+        registerCrash(new CrashDan(),false);
+        registerCrash(new CrashFlesh(),false);
+        registerCrash(new CrashGen(),false);
+        registerCrash(new CrashGen2(),false);
+        registerCrash(new CrashZen(),false);
+        registerCrash(new CrashZen2(),false);
         crashList.forEach(Crash::init);
         LogUtil.printMessage("Loaded %s crashers!",crashList.size());
     }

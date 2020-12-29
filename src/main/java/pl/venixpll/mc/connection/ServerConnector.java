@@ -81,7 +81,7 @@ public class ServerConnector implements IConnector {
                             public void channelActive(ChannelHandlerContext ctx) throws Exception {
                                 owner.sendChatMessage("&aConnecting...");
                                 TimeUnit.MILLISECONDS.sleep(150);
-                                sendPacket(new HandshakePacket(47,"",port,2));
+                                sendPacket(new HandshakePacket(47,host,port,2));
                                 sendPacket(new ClientLoginStartPacket(username));
                             }
 

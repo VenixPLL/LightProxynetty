@@ -13,10 +13,7 @@ import pl.venixpll.mc.packet.impl.server.login.ServerLoginDisconnectPacket;
 import pl.venixpll.mc.packet.impl.server.login.ServerLoginEncryptionRequestPacket;
 import pl.venixpll.mc.packet.impl.server.login.ServerLoginSetCompressionPacket;
 import pl.venixpll.mc.packet.impl.server.login.ServerLoginSuccessPacket;
-import pl.venixpll.mc.packet.impl.server.play.ServerDisconnectPacket;
-import pl.venixpll.mc.packet.impl.server.play.ServerJoinGamePacket;
-import pl.venixpll.mc.packet.impl.server.play.ServerKeepAlivePacket;
-import pl.venixpll.mc.packet.impl.server.play.ServerTimeUpdatePacket;
+import pl.venixpll.mc.packet.impl.server.play.*;
 import pl.venixpll.mc.packet.impl.server.status.ServerStatusPongPacket;
 import pl.venixpll.mc.packet.impl.server.status.ServerStatusResponsePacket;
 
@@ -96,6 +93,7 @@ public class PacketRegistry {
         registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.CLIENTBOUND,new ServerKeepAlivePacket());// 0x00
         registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.CLIENTBOUND,new ServerDisconnectPacket());
         registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.CLIENTBOUND,new ServerTimeUpdatePacket());
+        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.CLIENTBOUND,new ServerChatPacket());
     }
 
 
