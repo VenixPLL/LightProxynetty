@@ -1,5 +1,6 @@
 package pl.venixpll;
 
+import lombok.Getter;
 import pl.venixpll.api.ProxyAPI;
 import pl.venixpll.mc.data.chat.Message;
 import pl.venixpll.mc.data.status.PlayerInfo;
@@ -26,6 +27,7 @@ import java.util.concurrent.Executors;
 
 public class LightProxy {
 
+    @Getter
     private static MinecraftServer server;
 
     public static ProxyChecker PLChecker;
@@ -62,11 +64,6 @@ public class LightProxy {
         final PlayerInfo playerInfo = new PlayerInfo(0,0);
         final Message desc = Message.fromString(LogUtil.fixColor("&fLight&6Proxy &8» &6Wersja &c0.1 &6SHIT\n&fLight&6Proxy &8» &6Nie polecam chujowe proksi"));
         server.setStatusInfo(new ServerStatusInfo(versionInfo,playerInfo,desc, statusFile.exists() ? ImageUtil.iconToString(bufferedImage) : null));
-    }
-
-
-    public static MinecraftServer getServer(){
-        return server;
     }
 
 }

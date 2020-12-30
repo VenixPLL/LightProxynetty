@@ -95,6 +95,8 @@ public class ServerConnector implements IConnector {
 
                             @Override
                             protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
+                                owner.setLastPacket(packet.getClass().getSimpleName());
+                                owner.setPacketID(packet.getPacketID());
                                 if(packet instanceof ServerLoginSetCompressionPacket) {
                                     setCompressionThreshold(((ServerLoginSetCompressionPacket) packet).getThreshold());
                                 }else if(packet instanceof ServerLoginEncryptionRequestPacket){

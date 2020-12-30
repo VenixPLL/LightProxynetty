@@ -24,6 +24,7 @@ public class CommandManager  {
         commands.add(new CommandBroadcast());
         commands.add(new CommandTps());
         commands.add(new CommandRespawn());
+        commands.add(new CommandDebugInfo());
     }
 
     public static void registerCommand(final Command command){

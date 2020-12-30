@@ -12,6 +12,6 @@ public class CommandMother extends Command {
     @Override
     public void onExecute(String cmd, Player sender) throws Exception {
         sender.setMother(!sender.isMother());
-        sender.sendChatMessage("&cMother was set to " + sender.isMother());
+        sender.sendChatMessage("&6Mother was set to %s",sender.isMother() ? "&aTRUE" : "&cFALSE");
     }
 }

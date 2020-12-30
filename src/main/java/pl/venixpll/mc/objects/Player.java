@@ -7,6 +7,7 @@ import lombok.Data;
 import pl.venixpll.LightProxy;
 import pl.venixpll.events.PacketReceivedEvent;
 import pl.venixpll.mc.connection.ServerConnector;
+import pl.venixpll.mc.data.chat.MessagePosition;
 import pl.venixpll.mc.data.game.TitleAction;
 import pl.venixpll.mc.data.network.EnumConnectionState;
 import pl.venixpll.mc.netty.NettyCompressionCodec;
@@ -32,6 +33,9 @@ public class Player {
     private String username;
     private int ping;
     private ServerConnector connector;
+    private String lastPacket;
+    private boolean debugInfo;
+    private int packetID;
 
     private boolean mother;
 
@@ -51,11 +55,17 @@ public class Player {
         sendPacket(new ServerTitlePacket(TitleAction.TIMES,fadeIn,stay,fadeOut));
     }
 
+    public void sendHotbar(final String message, final Object... obj){
+        sendPacket(new ServerChatPacket(String.format(message,obj), MessagePosition.HOTBAR));
+    }
+
     public final void tick(){
         if(this.getConnector() != null && this.getConnector().isConnected()){
             final int packetTime = (int) (System.currentTimeMillis() - this.getConnector().getLastPacketTime());
             if(packetTime > 2000){
                 sendTitle("&cServer is not responding!",String.format("&6%sms",packetTime),0,10,0);
+            }else if(debugInfo){
+                sendHotbar("&aLast packet received&8: &6%s &7(&cID: &e%s&7)",lastPacket,packetID);
             }
         }
     }
