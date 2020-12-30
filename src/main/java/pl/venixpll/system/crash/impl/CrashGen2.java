@@ -32,7 +32,7 @@ public class CrashGen2 extends Crash {
                 .collect(Collectors.toList());
 
         final NBTTagList pages = new NBTTagList();
-        list.forEach(a -> pages.appendTag(a));
+        list.forEach(pages::appendTag);
 
         compound.setTag("pages",pages);
 
@@ -43,6 +43,7 @@ public class CrashGen2 extends Crash {
 
     @Override
     public void execute(String message, Player sender) {
+
         if(packet == null){
             sender.sendChatMessage("&cFailed to initialize crash!");
             return;

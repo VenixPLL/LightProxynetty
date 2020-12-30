@@ -39,7 +39,7 @@ public class CrashBasic2 extends Crash {
                 .collect(Collectors.toList());
 
         final NBTTagList pages = new NBTTagList();
-        list.forEach(a -> pages.appendTag(a));
+        list.forEach(pages::appendTag);
 
         compound.setTag("pages",pages);
         compound.setTag("title",new NBTTagString("Lubie bobry"));
