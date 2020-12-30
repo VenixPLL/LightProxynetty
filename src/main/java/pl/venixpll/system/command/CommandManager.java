@@ -18,7 +18,7 @@ public class CommandManager  {
     public static void init(){
         new Reflections("pl.venixpll.system.command.impl.*").getSubTypesOf(Command.class).forEach(command -> {
             try {
-                command.newInstance();
+                commands.add(command.newInstance());
             } catch (Exception ignored) {
             }
         });
