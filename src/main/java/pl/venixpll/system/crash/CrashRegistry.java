@@ -1,5 +1,6 @@
 package pl.venixpll.system.crash;
 
+import org.reflections.Reflections;
 import pl.venixpll.mc.objects.Player;
 import pl.venixpll.system.command.Command;
 import pl.venixpll.system.command.CommandManager;
@@ -25,21 +26,15 @@ public class CrashRegistry {
                 }
             }
         });
-        registerCrash(new CrashBasic(),false);
-        registerCrash(new CrashBasic2(),false);
-        registerCrash(new CrashDan(),false);
-        registerCrash(new CrashFlesh(),false);
-        registerCrash(new CrashGen(),false);
-        registerCrash(new CrashGen2(),false);
-        registerCrash(new CrashZen(),false);
-        registerCrash(new CrashZen2(),false);
-        crashList.forEach(Crash::init);
+        new Reflections("pl.venixpll.system.crash.impl.*").getSubTypesOf(Crash.class).forEach(crash -> {
+            try {
+                Crash c = crash.newInstance();
+                crashList.add(c);
+                c.init();
+            } catch (Exception ignored) {
+            }
+        });
         LogUtil.printMessage("Loaded %s crashers!",crashList.size());
-    }
-
-    public static void registerCrash(final Crash crash,boolean init){
-        if(init) crash.init();
-        crashList.add(crash);
     }
 
     public static void execute(final String message, final Player sender){

@@ -1,6 +1,7 @@
 package pl.venixpll.system.command;
 
 import com.darkmagician6.eventapi.EventManager;
+import org.reflections.Reflections;
 import pl.venixpll.events.PlayerCommandEvent;
 import pl.venixpll.mc.objects.Player;
 import pl.venixpll.system.command.impl.*;
@@ -15,16 +16,12 @@ public class CommandManager  {
     public static final List<Command> commands = new ArrayList<>();
 
     public static void init(){
-        commands.add(new CommandHelp());
-        commands.add(new CommandJoin());
-        commands.add(new CommandQuit());
-        commands.add(new CommandNBT());
-        commands.add(new CommandJoinBot());
-        commands.add(new CommandMother());
-        commands.add(new CommandBroadcast());
-        commands.add(new CommandTps());
-        commands.add(new CommandRespawn());
-        commands.add(new CommandDebugInfo());
+        new Reflections("pl.venixpll.system.command.impl.*").getSubTypesOf(Command.class).forEach(command -> {
+            try {
+                command.newInstance();
+            } catch (Exception ignored) {
+            }
+        });
     }
 
     public static void registerCommand(final Command command){
