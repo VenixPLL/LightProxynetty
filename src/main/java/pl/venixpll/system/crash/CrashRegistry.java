@@ -4,7 +4,6 @@ import org.reflections.Reflections;
 import pl.venixpll.mc.objects.Player;
 import pl.venixpll.system.command.Command;
 import pl.venixpll.system.command.CommandManager;
-import pl.venixpll.system.crash.impl.*;
 import pl.venixpll.utils.LogUtil;
 
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ public class CrashRegistry {
                 }
             }
         });
-        new Reflections("pl.venixpll.system.crash.impl.*").getSubTypesOf(Crash.class).forEach(crash -> {
+        new Reflections("pl.venixpll.system.crash.impl").getSubTypesOf(Crash.class).forEach(crash -> {
             try {
                 Crash c = crash.newInstance();
                 crashList.add(c);
