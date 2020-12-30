@@ -2,7 +2,6 @@ package net.minecraft.nbt;
 
 import com.google.common.collect.Lists;
 import pl.venixpll.utils.LogUtil;
-import sun.util.logging.PlatformLogger;
 
 import java.io.DataInput;
 import java.io.DataOutput;

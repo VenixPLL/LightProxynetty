@@ -1,7 +1,5 @@
 package pl.venixpll.system.command.impl;
 
-import javafx.scene.effect.Light;
-import pl.venixpll.LightProxy;
 import pl.venixpll.mc.connection.ServerConnector;
 import pl.venixpll.mc.connection.ServerPinger;
 import pl.venixpll.mc.objects.Player;
@@ -9,7 +7,6 @@ import pl.venixpll.system.command.Command;
 import pl.venixpll.utils.NetUtils;
 import pl.venixpll.utils.Util;
 
-import java.net.InetSocketAddress;
 import java.net.Proxy;
 
 public class CommandJoin extends Command {
