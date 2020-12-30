@@ -4,7 +4,6 @@ import com.darkmagician6.eventapi.EventManager;
 import org.reflections.Reflections;
 import pl.venixpll.events.PlayerCommandEvent;
 import pl.venixpll.mc.objects.Player;
-import pl.venixpll.system.command.impl.*;
 import pl.venixpll.utils.LogUtil;
 
 import java.util.ArrayList;
@@ -16,7 +15,7 @@ public class CommandManager  {
     public static final List<Command> commands = new ArrayList<>();
 
     public static void init(){
-        new Reflections("pl.venixpll.system.command.impl.*").getSubTypesOf(Command.class).forEach(command -> {
+        new Reflections("pl.venixpll.system.command.impl").getSubTypesOf(Command.class).forEach(command -> {
             try {
                 commands.add(command.newInstance());
             } catch (Exception ignored) {

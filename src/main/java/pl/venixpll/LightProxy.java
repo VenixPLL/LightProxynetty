@@ -19,7 +19,6 @@ import pl.venixpll.utils.ProxyChecker;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.OutputStream;
 import java.net.Proxy;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
