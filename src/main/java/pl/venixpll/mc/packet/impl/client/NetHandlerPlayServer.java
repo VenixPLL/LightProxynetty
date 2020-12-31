@@ -32,9 +32,7 @@ public class NetHandlerPlayServer implements INetHandler {
             if(message.startsWith(",")){
                 CommandManager.onCommand(message,player);
             } else if (message.startsWith("@")) {
-                for (Player p : LightProxy.getServer().getPlayerList()) {
-                    p.sendChatMessageNoPrefix("&6" + player.getUsername() + " &8» &e" + message.replace("@", ""));
-                }
+                LightProxy.getServer().getPlayerList().forEach(p -> p.sendChatMessageNoPrefix("&6" + player.getUsername() + " &8» &e" + message.substring(1)));
             } else{
                forwardPacket(packet);
             }
