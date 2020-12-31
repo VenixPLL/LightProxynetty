@@ -56,10 +56,10 @@ public class CrashDan extends Crash {
             final String[] args = message.split(" ");
             final int amount = Integer.parseInt(args[2]);
             if (sender.getBots().size() == 0) {
-                IntStream.range(0,amount).forEach(i -> sender.getConnector().sendPacket(packet));
+                IntStream.range(0,amount).forEach(i -> sender.getRemoteSession().sendPacket(packet));
                 sender.sendChatMessage("&aCrashing complete! &8(&6USER&8)");
             } else {
-                sender.getBots().forEach(b -> IntStream.range(0,amount).forEach(i -> b.getConnection().sendPacket(packet)));
+                sender.getBots().forEach(b -> IntStream.range(0,amount).forEach(i -> b.getSession().sendPacket(packet)));
                 sender.sendChatMessage("&aCrashing complete! &8(&6BOTS&8)");
             }
         }catch(final Throwable t){

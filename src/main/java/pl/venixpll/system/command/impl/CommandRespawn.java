@@ -14,7 +14,7 @@ public class CommandRespawn extends Command {
     public void onExecute(String cmd, Player sender) throws Exception {
         if(!sender.getBots().isEmpty()){
             sender.getBots().forEach(b -> {
-                if(b.getConnection().isConnected()) b.getConnection().sendPacket(new ClientStatusPacket(0));
+                if(b.isConnected()) b.getSession().sendPacket(new ClientStatusPacket(0));
             });
             sender.sendChatMessage("&aRespawned!");
         }else{

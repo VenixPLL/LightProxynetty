@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import pl.venixpll.mc.data.chat.Message;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.PacketBuffer;
+import pl.venixpll.mc.packet.Protocol;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,18 +14,20 @@ import pl.venixpll.mc.packet.PacketBuffer;
 public class ServerLoginDisconnectPacket extends Packet {
 
     {
-        this.setPacketID(0x00);
+        this.getProtocolList().add(new Protocol(0x00, 47));
+        this.getProtocolList().add(new Protocol(0x00, 110));
+        this.getProtocolList().add(new Protocol(0x00, 340));
     }
 
     private Message reason;
 
     @Override
-    public void write(PacketBuffer out) throws Exception {
+    public void write(PacketBuffer out, int protocol) throws Exception {
         out.writeString(reason.toJsonString());
     }
 
     @Override
-    public void read(PacketBuffer in) throws Exception {
+    public void read(PacketBuffer in, int protocol) throws Exception {
         this.reason = Message.fromString(in.readStringFromBuffer(32767));
     }
 }

@@ -12,12 +12,11 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import pl.venixpll.mc.data.network.EnumConnectionState;
 import pl.venixpll.mc.data.network.EnumPacketDirection;
-import pl.venixpll.mc.netty.NettyCompressionCodec;
 import pl.venixpll.mc.netty.NettyPacketCodec;
 import pl.venixpll.mc.netty.NettyVarInt21FrameCodec;
 import pl.venixpll.mc.objects.Player;
+import pl.venixpll.mc.objects.Session;
 import pl.venixpll.mc.packet.Packet;
-import pl.venixpll.mc.packet.impl.CustomPacket;
 import pl.venixpll.mc.packet.impl.client.login.ClientLoginStartPacket;
 import pl.venixpll.mc.packet.impl.client.play.ClientKeepAlivePacket;
 import pl.venixpll.mc.packet.impl.handshake.HandshakePacket;
@@ -39,20 +38,13 @@ import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Data
-public class ServerConnector implements IConnector {
+public class ServerConnector {
 
     private final Player owner;
     private final String username;
 
-    private Channel channel;
-    private EnumConnectionState connectionState = EnumConnectionState.LOGIN;
-    private boolean connected;
-
     private final ArrayList<Long> tpstimes = new ArrayList<>();
-    private double lastTps;
     private final WaitTimer tpsTimer = new WaitTimer();
-
-    private long lastPacketTime = 0L;
 
     private final LazyLoadBase<NioEventLoopGroup> CLIENT_NIO_EVENT_LOOP_PING = new LazyLoadBase<NioEventLoopGroup>() {
         @Override
@@ -61,7 +53,6 @@ public class ServerConnector implements IConnector {
         }
     };
 
-    @Override
     public void connect(String host, int port, Proxy proxy) {
         final Bootstrap bootstrap  = new Bootstrap()
                 .group(CLIENT_NIO_EVENT_LOOP_PING.getValue())
@@ -81,46 +72,45 @@ public class ServerConnector implements IConnector {
                             public void channelActive(ChannelHandlerContext ctx) throws Exception {
                                 owner.sendChatMessage("&aConnecting...");
                                 TimeUnit.MILLISECONDS.sleep(150);
-                                sendPacket(new HandshakePacket(47,host,port,2));
-                                sendPacket(new ClientLoginStartPacket(username));
+                                owner.getRemoteSession().sendPacket(new HandshakePacket(owner.getSession().getProtocolID(),host,port,2));
+                                owner.getRemoteSession().sendPacket(new ClientLoginStartPacket(username));
                             }
 
                             @Override
                             public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-                                if(connected){
+                                if(owner.isConnected()){
                                     owner.sendChatMessage("&cServer disconnected directly!");
                                 }
-                                connected = false;
+                                owner.setConnected(false);
                             }
 
                             @Override
                             protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
-                                owner.setLastPacket(packet.getClass().getSimpleName());
-                                owner.setPacketID(packet.getPacketID());
                                 if(packet instanceof ServerLoginSetCompressionPacket) {
-                                    setCompressionThreshold(((ServerLoginSetCompressionPacket) packet).getThreshold());
+                                    owner.getRemoteSession().setCompressionThreshold(((ServerLoginSetCompressionPacket) packet).getThreshold());
                                 }else if(packet instanceof ServerLoginEncryptionRequestPacket){
                                     owner.sendChatMessage("&cProxy does not support Minecraft Premium!");
-                                    close();
+                                    owner.setConnected(false);
+                                    owner.getRemoteSession().getChannel().close();
                                 }else if(packet instanceof ServerLoginSuccessPacket){
-                                    setConnectionState(EnumConnectionState.PLAY);
+                                    owner.getRemoteSession().setConnectionState(EnumConnectionState.PLAY);
                                     owner.sendChatMessage("&aLogged in!");
                                 }else if(packet instanceof ServerJoinGamePacket) {
+                                    owner.setConnected(true);
                                     WorldUtils.dimSwitch(owner, (ServerJoinGamePacket) packet);
-                                    connected = true;
                                     owner.sendChatMessage("&aConnected!");
                                 }else if(packet instanceof ServerDisconnectPacket) {
-                                    connected = false;
+                                    owner.setConnected(false);
                                     WorldUtils.emptyWorld(owner);
                                     owner.sendChatMessage("&cDisconnected!");
                                     owner.sendChatMessage("&f" + ((ServerDisconnectPacket) packet).getReason().getFullText());
                                 }else if(packet instanceof ServerLoginDisconnectPacket){
-                                    connected = false;
+                                    owner.setConnected(false);
                                     owner.sendChatMessage("&cDisconnected during login!");
                                     owner.sendChatMessage("&f" + ((ServerLoginDisconnectPacket) packet).getReason().getFullText());
                                 }else if(packet instanceof ServerKeepAlivePacket){
-                                    sendPacket(new ClientKeepAlivePacket(((ServerKeepAlivePacket) packet).getKeepaliveId()));
-                                }else if(connected && connectionState == EnumConnectionState.PLAY){
+                                    owner.getRemoteSession(). sendPacket(new ClientKeepAlivePacket(((ServerKeepAlivePacket) packet).getKeepaliveId()));
+                                }else if(owner.isConnected() && owner.getRemoteSession().getConnectionState() == EnumConnectionState.PLAY){
                                     if(packet instanceof ServerTimeUpdatePacket) {
                                         tpstimes.add(Math.max(1000, tpsTimer.getTime()));
                                         long timesAdded = 0;
@@ -131,44 +121,20 @@ public class ServerConnector implements IConnector {
                                             timesAdded += l;
                                         }
                                         long roundedTps = timesAdded / tpstimes.size();
-                                        lastTps = (20.0 / roundedTps) * 1000.0;
+                                        owner.setLastTps((20.0 / roundedTps) * 1000.0);
                                         tpsTimer.reset();
                                     }
-                                    lastPacketTime = System.currentTimeMillis();
-                                    owner.sendPacket(packet);
+                                    owner.getSession().sendPacket(packet);
                                 }
                             }
                         });
                     }
                 });
-        this.channel = bootstrap.connect(host, port).syncUninterruptibly().channel();
-        this.channel.config().setOption(ChannelOption.TCP_NODELAY, true);
-        this.channel.config().setOption(ChannelOption.IP_TOS, 0x18);
-    }
-
-    public void setConnectionState(final EnumConnectionState state){
-        ((NettyPacketCodec)channel.pipeline().get("packetCodec")).setConnectionState(state);
-        connectionState = state;
-    }
-
-    public void setCompressionThreshold(final int threshold){
-        if(connectionState == EnumConnectionState.LOGIN) {
-            if (channel.pipeline().get("compression") == null) {
-                channel.pipeline().addBefore("packetCodec", "compression", new NettyCompressionCodec(threshold));
-            } else {
-                ((NettyCompressionCodec) channel.pipeline().get("compression")).setCompressionThreshold(threshold);
-            }
-        }else{
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    public void close(){
-        connected = false;
-        this.channel.close();
-    }
-
-    public void sendPacket(final Packet packet){
-        this.channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+        owner.setRemoteSession(new Session(bootstrap.connect(host, port).syncUninterruptibly().channel()));
+        owner.getRemoteSession().setProtocolID(owner.getSession().getProtocolID());
+        owner.getRemoteSession().setConnectionState(EnumConnectionState.LOGIN);
+        owner.getRemoteSession().getChannel().config().setOption(ChannelOption.TCP_NODELAY, true);
+        owner.getRemoteSession().getChannel().config().setOption(ChannelOption.IP_TOS, 0x18);
+        owner.getRemoteSession().setUsername(username);
     }
 }

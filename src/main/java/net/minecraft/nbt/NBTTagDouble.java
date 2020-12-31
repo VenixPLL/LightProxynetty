@@ -1,9 +1,10 @@
 package net.minecraft.nbt;
 
+import pl.venixpll.utils.MathHelper;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import pl.venixpll.utils.MathHelper;
 
 public class NBTTagDouble extends NBTBase.NBTPrimitive
 {

@@ -21,7 +21,7 @@ public class CommandNBT extends Command {
         final NBTTagCompound compound = new NBTTagCompound();
         compound.setTag("pages",nbtTagList);
         final ItemStack stack = new ItemStack(386,1,0,compound);
-        sender.getConnector().sendPacket(new ClientCreativeInventoryAction(36,stack));
+        sender.getRemoteSession().sendPacket(new ClientCreativeInventoryAction(36,stack));
         sender.sendChatMessage("&cSent NBT!");
     }
 }

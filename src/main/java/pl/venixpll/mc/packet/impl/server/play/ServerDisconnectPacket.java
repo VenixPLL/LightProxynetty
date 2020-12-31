@@ -1,11 +1,11 @@
 package pl.venixpll.mc.packet.impl.server.play;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.venixpll.mc.data.chat.Message;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.PacketBuffer;
+import pl.venixpll.mc.packet.Protocol;
 import pl.venixpll.utils.LogUtil;
 
 @Data
@@ -13,7 +13,9 @@ import pl.venixpll.utils.LogUtil;
 public class ServerDisconnectPacket extends Packet {
 
     {
-        this.setPacketID(0x40);
+        this.getProtocolList().add(new Protocol(0x40, 47));
+        this.getProtocolList().add(new Protocol(0x1A, 110));
+        this.getProtocolList().add(new Protocol(0x1A, 340));
     }
 
     private Message reason;
@@ -23,12 +25,12 @@ public class ServerDisconnectPacket extends Packet {
     }
 
     @Override
-    public void write(PacketBuffer out) throws Exception {
+    public void write(PacketBuffer out, int protocol) throws Exception {
         out.writeString(reason.toJsonString());
     }
 
     @Override
-    public void read(PacketBuffer in) throws Exception {
+    public void read(PacketBuffer in, int protocol) throws Exception {
         this.reason = Message.fromString(in.readStringFromBuffer(32767));
     }
 }

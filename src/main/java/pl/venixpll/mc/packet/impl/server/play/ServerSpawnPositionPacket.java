@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import pl.venixpll.mc.data.Position;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.PacketBuffer;
+import pl.venixpll.mc.packet.Protocol;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,18 +14,20 @@ import pl.venixpll.mc.packet.PacketBuffer;
 public class ServerSpawnPositionPacket extends Packet {
 
     {
-        this.setPacketID(0x05);
+        this.getProtocolList().add(new Protocol(0x05, 47));
+        this.getProtocolList().add(new Protocol(0x43, 110));
+        this.getProtocolList().add(new Protocol(0x46, 340));
     }
 
     private Position position;
 
     @Override
-    public void write(PacketBuffer out) throws Exception {
+    public void write(PacketBuffer out, int protocol) throws Exception {
         out.writePosition(this.position);
     }
 
     @Override
-    public void read(PacketBuffer in) throws Exception {
+    public void read(PacketBuffer in, int protocol) throws Exception {
         this.position = in.readPosition();
     }
 }

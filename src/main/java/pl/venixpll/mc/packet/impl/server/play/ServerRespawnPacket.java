@@ -8,6 +8,7 @@ import pl.venixpll.mc.data.game.Dimension;
 import pl.venixpll.mc.data.game.Gamemode;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.PacketBuffer;
+import pl.venixpll.mc.packet.Protocol;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,7 +16,9 @@ import pl.venixpll.mc.packet.PacketBuffer;
 public class ServerRespawnPacket extends Packet {
 
     {
-        this.setPacketID(0x07);
+        this.getProtocolList().add(new Protocol(0x07, 47));
+        this.getProtocolList().add(new Protocol(0x33, 110));
+        this.getProtocolList().add(new Protocol(0x35, 340));
     }
 
     private Dimension dimension;
@@ -25,7 +28,7 @@ public class ServerRespawnPacket extends Packet {
 
 
     @Override
-    public void write(PacketBuffer out) throws Exception {
+    public void write(PacketBuffer out, int protocol) throws Exception {
         out.writeInt(this.dimension.getId());
         out.writeByte(this.difficulty.getId());
         out.writeByte(this.gamemode.getId());
@@ -33,7 +36,7 @@ public class ServerRespawnPacket extends Packet {
     }
 
     @Override
-    public void read(PacketBuffer in) throws Exception {
+    public void read(PacketBuffer in, int protocol) throws Exception {
         this.dimension = Dimension.getById(in.readInt());
         this.difficulty = Difficulty.getById(in.readUnsignedByte());
         this.gamemode = Gamemode.getById(in.readUnsignedByte());

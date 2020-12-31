@@ -6,6 +6,7 @@ import pl.venixpll.mc.data.chat.Message;
 import pl.venixpll.mc.data.game.TitleAction;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.PacketBuffer;
+import pl.venixpll.mc.packet.Protocol;
 import pl.venixpll.utils.LogUtil;
 
 @NoArgsConstructor
@@ -13,7 +14,9 @@ import pl.venixpll.utils.LogUtil;
 public class ServerTitlePacket extends Packet {
 
     {
-        this.setPacketID(0x45);
+        this.getProtocolList().add(new Protocol(0x45, 47));
+        this.getProtocolList().add(new Protocol(0x45, 110));
+        this.getProtocolList().add(new Protocol(0x48, 340));
     }
 
     private TitleAction titleAction;
@@ -53,42 +56,42 @@ public class ServerTitlePacket extends Packet {
 
 
     @Override
-    public void write(PacketBuffer out) throws Exception {
-        out.writeVarIntToBuffer(titleAction.getId());
-        switch(titleAction){
-            case TITLE:
-                out.writeString(this.title.toJsonString());
-                break;
-            case SUBTITLE:
-                out.writeString(this.subTitle.toJsonString());
-                break;
-            case TIMES:
-                out.writeInt(this.fadeIn);
-                out.writeInt(this.stay);
-                out.writeInt(this.fadeOut);
-                break;
-            default:
-                break;
+    public void write(PacketBuffer out, int protocol) throws Exception {
+        if(titleAction == TitleAction.TIMES && protocol == 340) {
+            out.writeVarIntToBuffer(3);
+        } else {
+            out.writeVarIntToBuffer(titleAction.getId());
+        }
+        if(titleAction == TitleAction.TITLE) {
+            out.writeString(this.title.toJsonString());
+        } else if (titleAction == TitleAction.SUBTITLE) {
+            out.writeString(this.subTitle.toJsonString());
+        }
+        if(titleAction == TitleAction.TIMES) {
+            out.writeInt(this.fadeIn);
+            out.writeInt(this.stay);
+            out.writeInt(this.fadeOut);
         }
     }
 
     @Override
-    public void read(PacketBuffer in) throws Exception {
-        this.titleAction = TitleAction.getById(in.readVarIntFromBuffer());
-        switch(titleAction){
-            case TITLE:
-                this.title = Message.fromString(in.readStringFromBuffer(32767));
-                break;
-            case SUBTITLE:
-                this.subTitle = Message.fromString(in.readStringFromBuffer(32767));
-                break;
-            case TIMES:
-                this.fadeIn = in.readInt();
-                this.stay = in.readInt();
-                this.fadeOut = in.readInt();
-                break;
-            default:
-                break;
+    public void read(PacketBuffer in, int protocol) throws Exception {
+        int t = in.readVarIntFromBuffer();
+
+        if(t == 3 && protocol == 340) {
+            this.titleAction = TitleAction.TIMES;
+        } else {
+            this.titleAction = TitleAction.getById(t);
+        }
+
+        if(titleAction == TitleAction.TITLE) {
+            this.title = Message.fromString(in.readStringFromBuffer(32767));
+        } else if (titleAction == TitleAction.SUBTITLE) {
+            this.subTitle = Message.fromString(in.readStringFromBuffer(32767));
+        } else if (titleAction == TitleAction.TIMES) {
+            this.fadeIn = in.readInt();
+            this.stay = in.readInt();
+            this.fadeOut = in.readInt();
         }
     }
 }

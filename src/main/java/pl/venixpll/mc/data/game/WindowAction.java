@@ -1,6 +1,6 @@
 package pl.venixpll.mc.data.game;
 
-import java.util.*;
+import java.util.Arrays;
 
 public enum WindowAction
 {

@@ -4,6 +4,8 @@ package pl.venixpll.mc.packet.registry;
 import pl.venixpll.mc.data.network.EnumConnectionState;
 import pl.venixpll.mc.data.network.EnumPacketDirection;
 import pl.venixpll.mc.packet.Packet;
+import pl.venixpll.mc.packet.Protocol;
+import pl.venixpll.mc.packet.impl.CustomPacket;
 import pl.venixpll.mc.packet.impl.client.login.ClientLoginStartPacket;
 import pl.venixpll.mc.packet.impl.client.play.*;
 import pl.venixpll.mc.packet.impl.client.status.ClientStatusPingPacket;
@@ -21,48 +23,49 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 
 public class PacketRegistry {
+    private final static  HashMap<Protocol, Packet> CLIENT_STATUS = new HashMap<>();
+    private final static HashMap<Protocol, Packet> CLIENT_LOGIN = new HashMap<>();
+    private final static HashMap<Protocol, Packet> CLIENT_PLAY = new HashMap<>();
 
-    private static HashMap<Integer, Packet> CLIENT_STATUS = new HashMap<>();
-    private static HashMap<Integer,Packet> CLIENT_LOGIN = new HashMap<>();
-    private static HashMap<Integer,Packet> CLIENT_PLAY = new HashMap<>();
+    private final static HashMap<Protocol, Packet> SERVER_STATUS = new HashMap<>();
+    private final static HashMap<Protocol, Packet> SERVER_LOGIN = new HashMap<>();
+    private final static HashMap<Protocol, Packet> SERVER_PLAY = new HashMap<>();
 
-    private static HashMap<Integer,Packet> SERVER_STATUS = new HashMap<>();
-    private static HashMap<Integer,Packet> SERVER_LOGIN = new HashMap<>();
-    private static HashMap<Integer,Packet> SERVER_PLAY = new HashMap<>();
 
     public static void registerPacket(EnumConnectionState connectionState, EnumPacketDirection direction, Packet packet){
-        final int packetId = packet.getPacketID();
-        switch(direction){
-            case SERVERBOUND:
-                switch(connectionState){
-                    case HANDSHAKE:
-                        throw new IllegalArgumentException("Cannot add handshakePacket!");
-                    case LOGIN:
-                        CLIENT_LOGIN.put(packetId,packet);
-                        break;
-                    case PLAY:
-                        CLIENT_PLAY.put(packetId,packet);
-                        break;
-                    case STATUS:
-                        CLIENT_STATUS.put(packetId,packet);
-                        break;
-                }
-                break;
-            case CLIENTBOUND:
-                switch(connectionState){
-                    case HANDSHAKE:
-                        throw new IllegalArgumentException("Cannot add handshakePacket to CLIENTBOUND!");
-                    case LOGIN:
-                        SERVER_LOGIN.put(packetId,packet);
-                        break;
-                    case PLAY:
-                        SERVER_PLAY.put(packetId,packet);
-                        break;
-                    case STATUS:
-                        SERVER_STATUS.put(packetId,packet);
-                        break;
-                }
-                break;
+        for(Protocol protocol : packet.getProtocolList()) {
+            switch (direction) {
+                case SERVERBOUND:
+                    switch (connectionState) {
+                        case HANDSHAKE:
+                            throw new IllegalArgumentException("Cannot add handshakePacket!");
+                        case LOGIN:
+                            CLIENT_LOGIN.put(protocol, packet);
+                            break;
+                        case PLAY:
+                            CLIENT_PLAY.put(protocol, packet);
+                            break;
+                        case STATUS:
+                            CLIENT_STATUS.put(protocol, packet);
+                            break;
+                    }
+                    break;
+                case CLIENTBOUND:
+                    switch (connectionState) {
+                        case HANDSHAKE:
+                            throw new IllegalArgumentException("Cannot add handshakePacket to CLIENTBOUND!");
+                        case LOGIN:
+                            SERVER_LOGIN.put(protocol, packet);
+                            break;
+                        case PLAY:
+                            SERVER_PLAY.put(protocol, packet);
+                            break;
+                        case STATUS:
+                            SERVER_STATUS.put(protocol, packet);
+                            break;
+                    }
+                    break;
+            }
         }
     }
 
@@ -97,32 +100,32 @@ public class PacketRegistry {
     }
 
 
-    public static Packet getPacket(EnumConnectionState connectionState, EnumPacketDirection direction, int id){
-        return getNewInstance(getPacketA(connectionState,direction,id));
+    public static Packet getPacket(EnumConnectionState connectionState, EnumPacketDirection direction, int id, int protocol){
+        return getNewInstance(getPacketA(connectionState,direction,new Protocol(id, protocol)), id);
     }
 
-    private static Packet getPacketA(EnumConnectionState connectionState, EnumPacketDirection direction, int id){
-        switch(direction){
+    private static Packet getPacketA(EnumConnectionState connectionState, EnumPacketDirection direction, Protocol protocol) {
+        switch(direction) {
             case SERVERBOUND:
-                switch(connectionState){
+                switch(connectionState) {
                     case HANDSHAKE:
                         return new HandshakePacket();
                     case LOGIN:
-                        return CLIENT_LOGIN.get(id);
+                        return CLIENT_LOGIN.get(protocol);
                     case PLAY:
-                        return CLIENT_PLAY.get(id);
+                        return CLIENT_PLAY.get(protocol);
                     case STATUS:
-                        return CLIENT_STATUS.get(id);
+                        return CLIENT_STATUS.get(protocol);
                 }
                 break;
             case CLIENTBOUND:
-                switch(connectionState){
+                switch(connectionState) {
                     case LOGIN:
-                        return SERVER_LOGIN.get(id);
+                        return SERVER_LOGIN.get(protocol);
                     case PLAY:
-                        return SERVER_PLAY.get(id);
+                        return SERVER_PLAY.get(protocol);
                     case STATUS:
-                        return SERVER_STATUS.get(id);
+                        return SERVER_STATUS.get(protocol);
 
                 }
                 break;
@@ -130,8 +133,8 @@ public class PacketRegistry {
         return null;
     }
 
-    private static Packet getNewInstance(final Packet packetIn){
-        if(packetIn == null) return null;
+    private static Packet getNewInstance(final Packet packetIn, int id){
+        if(packetIn == null) return new CustomPacket(id);
         Class<? extends Packet> packet = packetIn.getClass();
         try {
             Constructor<? extends Packet> constructor = packet.getDeclaredConstructor();
@@ -141,7 +144,7 @@ public class PacketRegistry {
 
             return constructor.newInstance();
         }catch(Exception e) {
-            throw new IllegalStateException("Failed to instantiate packet \"" + packetIn.getPacketID() + ", " + packet.getName() + "\".", e);
+            throw new IllegalStateException("Failed to instantiate packet \"" + id + ", " + packet.getName() + "\".", e);
         }
     }
 

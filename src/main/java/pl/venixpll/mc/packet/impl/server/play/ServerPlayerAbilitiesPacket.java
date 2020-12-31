@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.PacketBuffer;
+import pl.venixpll.mc.packet.Protocol;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,13 +13,16 @@ import pl.venixpll.mc.packet.PacketBuffer;
 public class ServerPlayerAbilitiesPacket extends Packet {
 
     {
-        this.setPacketID(0x39);
+        this.getProtocolList().add(new Protocol(0x39, 47));
+        this.getProtocolList().add(new Protocol(0x2B, 110));
+        this.getProtocolList().add(new Protocol(0x2C, 340));
     }
+
     private boolean damage, flying, allowFlying, creative;
     private float flySpeed, walkSpeed;
 
     @Override
-    public void write(PacketBuffer out) throws Exception {
+    public void write(PacketBuffer out, int protocol) throws Exception {
         byte flags = 0;
         if (this.damage) {
             flags = (byte) (flags | 0x1);
@@ -38,7 +42,7 @@ public class ServerPlayerAbilitiesPacket extends Packet {
     }
 
     @Override
-    public void read(PacketBuffer in) throws Exception {
+    public void read(PacketBuffer in, int protocol) throws Exception {
         final byte flags = in.readByte();
         this.damage = ((flags & 0x1) > 0);
         this.flying = ((flags & 0x2) > 0);

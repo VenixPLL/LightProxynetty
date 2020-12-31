@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import pl.venixpll.mc.data.item.ItemStack;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.PacketBuffer;
+import pl.venixpll.mc.packet.Protocol;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,7 +14,9 @@ import pl.venixpll.mc.packet.PacketBuffer;
 public class ClientCreativeInventoryAction extends Packet {
 
     {
-        this.setPacketID(0x10);
+        this.getProtocolList().add(new Protocol(0x10, 47));
+        this.getProtocolList().add(new Protocol(0x18, 110));
+        this.getProtocolList().add(new Protocol(0x1B, 340));
     }
 
     private int slot;
@@ -21,13 +24,13 @@ public class ClientCreativeInventoryAction extends Packet {
 
 
     @Override
-    public void write(PacketBuffer out) throws Exception {
+    public void write(PacketBuffer out, int protocol) throws Exception {
         out.writeShort(slot);
         out.writeItemStackToBuffer(itemStack);
     }
 
     @Override
-    public void read(PacketBuffer in) throws Exception {
+    public void read(PacketBuffer in, int protocol) throws Exception {
         this.slot = in.readShort();
         this.itemStack = in.readItemStackFromBuffer();
     }

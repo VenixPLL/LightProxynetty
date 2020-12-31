@@ -2,20 +2,14 @@ package pl.venixpll.mc.packet;
 
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 public abstract class Packet {
+    private List<Protocol> protocolList = new ArrayList<>();
 
-    private int packetID;
-    private byte[] customData;
-    private boolean custom;
+    public abstract void write(PacketBuffer out, int protocol) throws Exception;
 
-    public abstract void write(PacketBuffer out) throws Exception;
-    public abstract void read(PacketBuffer in) throws Exception;
-
-    public void setCustom(int id,byte[] data){
-        this.custom = true;
-        this.packetID = id;
-        this.customData = data;
-    }
-
+    public abstract void read(PacketBuffer in, int protocol) throws Exception;
 }

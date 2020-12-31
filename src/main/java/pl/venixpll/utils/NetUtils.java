@@ -54,9 +54,7 @@ public class NetUtils {
     }
 
     public static Packet createPacket(final int id, final byte[] data){
-        final Packet packet = new CustomPacket();
-        packet.setCustom(id,data);
-        return packet;
+        return new CustomPacket(id, data);
     }
 
 }

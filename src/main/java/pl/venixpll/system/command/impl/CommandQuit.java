@@ -18,19 +18,18 @@ public class CommandQuit extends Command {
                     sender.sendChatMessage("&cYou do not have any bots!");
                 }else{
                     sender.getBots().forEach(bot -> {
-                        bot.getConnection().close();
+                        bot.getSession().getChannel().close();
                     });
                     sender.sendChatMessage("&cDisconnected all bots!");
                 }
                 return;
             }
         }
-        if(sender.getConnector() != null && sender.getConnector().isConnected()){
+        if(sender.isConnected()){
             sender.sendChatMessage("&cDisconnected!");
-            sender.getConnector().close();
-        }else if(sender.getConnector() != null && !sender.getConnector().isConnected()){
-            sender.sendChatMessage("&cYou are not connected!");
-        }else if(sender.getConnector() == null){
+            sender.setConnected(false);
+            sender.getRemoteSession().getChannel().close();
+        } else if(!sender.isConnected()){
             sender.sendChatMessage("&cYou are not connected!");
         }
     }

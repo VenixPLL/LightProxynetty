@@ -36,8 +36,6 @@ public class CommandJoin extends Command {
         }
         final String username = args[2];
         final boolean ping = Boolean.parseBoolean(args[3]);
-        final ServerConnector connector = new ServerConnector(sender,username);
-        sender.setConnector(connector);
 
         final Proxy proxy = Util.getProxyByName(args[4]);
 
@@ -48,11 +46,9 @@ public class CommandJoin extends Command {
             }
         }
 
-        if(ping){
-            final ServerPinger pinger = new ServerPinger(sender,true,connector);
-            pinger.connect(host,port, proxy);
-        }else{
-            connector.connect(host,port,proxy);
+        if (ping) {
+            new ServerPinger(sender, true).connect(host, port, proxy);
         }
+        new ServerConnector(sender, username).connect(host, port, proxy);
     }
 }

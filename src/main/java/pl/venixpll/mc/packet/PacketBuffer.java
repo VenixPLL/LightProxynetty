@@ -13,7 +13,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import pl.venixpll.mc.data.Position;
 import pl.venixpll.mc.data.item.ItemStack;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;

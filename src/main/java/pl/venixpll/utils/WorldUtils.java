@@ -11,14 +11,14 @@ public class WorldUtils {
 
     public static void emptyWorld(Player player){
         dimSwitch(player,new ServerJoinGamePacket(0, Gamemode.SURVIVAL, Dimension.OVERWORLD, Difficulty.PEACEFULL,1,"default_1_1",false));
-        player.sendPacket(new ServerSpawnPositionPacket(new Position(0,0,0)));
-        player.sendPacket(new ServerPlayerAbilitiesPacket(false,true,false,false,2,2));
-        player.sendPacket(new ServerPlayerPosLookPacket(new Position(0,0,0),180,90,true));
+        player.getSession().sendPacket(new ServerSpawnPositionPacket(new Position(0,0,0)));
+        player.getSession().sendPacket(new ServerPlayerAbilitiesPacket(false,true,false,false,2,2));
+        player.getSession().sendPacket(new ServerPlayerPositionRotationPacket(new Position(0,0,0),0.0f, 0.0f));
     }
 
     public static void dimSwitch(Player player, ServerJoinGamePacket packet){
-        player.sendPacket(new ServerRespawnPacket(Dimension.END, Difficulty.PEACEFULL,Gamemode.ADVENTURE,"default_1_1"));
-        player.sendPacket(packet);
-        player.sendPacket(new ServerRespawnPacket(packet.getDimension(),packet.getDifficulty(),packet.getGamemode(),packet.getLevelType()));
+        player.getSession().sendPacket(new ServerRespawnPacket(Dimension.END, Difficulty.PEACEFULL,Gamemode.ADVENTURE,"default_1_1"));
+        player.getSession().sendPacket(packet);
+        player.getSession().sendPacket(new ServerRespawnPacket(packet.getDimension(),packet.getDifficulty(),packet.getGamemode(),packet.getLevelType()));
     }
 }

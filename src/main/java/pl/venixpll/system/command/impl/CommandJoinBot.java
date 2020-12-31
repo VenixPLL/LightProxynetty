@@ -1,16 +1,22 @@
 package pl.venixpll.system.command.impl;
 
-import pl.venixpll.mc.bot.BotManager;
+import pl.venixpll.mc.connection.BotConnection;
+import pl.venixpll.mc.connection.ServerPinger;
+import pl.venixpll.mc.objects.Bot;
 import pl.venixpll.mc.objects.Player;
 import pl.venixpll.system.command.Command;
 import pl.venixpll.utils.NetUtils;
+
+import java.net.Proxy;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class CommandJoinBot extends Command {
 
     public CommandJoinBot() {
         super(",joinbot", "Connecting bots to server", "<host:port> <usernames> <amount> <delay> <ping> <proxies>");
     }
-
     @Override
     public void onExecute(String cmd, Player sender) throws Exception {
         final String[] args = cmd.split(" ");
@@ -30,12 +36,33 @@ public class CommandJoinBot extends Command {
                 return;
             }
         }
+
         final String usernames = args[2];
         final int amount = Integer.parseInt(args[3]);
         final int delay = Integer.parseInt(args[4]);
-        final boolean doPing = Boolean.parseBoolean(args[5]);
-        final String proxy = args[6];
-        sender.sendChatMessage("&aSending!");
-        BotManager.connectSome(host,port,usernames,amount,delay,doPing,proxy,sender);
+        final boolean ping = Boolean.parseBoolean(args[6]);
+        connect(sender, delay, host, port, usernames, amount, ping);
+    }
+
+    private void connect(final Player sender, final int delay, final String host, final int port, final String usernames, final int amount, final boolean ping) {
+        final ExecutorService service = Executors.newSingleThreadExecutor();
+        service.submit(() -> {
+            sender.sendChatMessage("&aSending!");
+            for (int i = 0; i < amount; i++) {
+                final String username = (usernames + i);
+
+                if(ping){
+                    final ServerPinger pinger = new ServerPinger(sender,false);
+                    pinger.connect(host, port, Proxy.NO_PROXY);
+                }
+                new BotConnection().connect(host, port, Proxy.NO_PROXY, new Bot(username, sender));
+                try {
+                    TimeUnit.MILLISECONDS.sleep(delay);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            sender.sendChatMessage("&aSent all bots!");
+        });
     }
 }

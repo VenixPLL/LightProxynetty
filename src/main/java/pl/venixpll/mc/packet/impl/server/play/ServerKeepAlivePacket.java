@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.PacketBuffer;
+import pl.venixpll.mc.packet.Protocol;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,18 +13,28 @@ import pl.venixpll.mc.packet.PacketBuffer;
 public class ServerKeepAlivePacket extends Packet {
 
     {
-        this.setPacketID(0x00);
+        this.getProtocolList().add(new Protocol(0x00, 47));
+        this.getProtocolList().add(new Protocol(0x1F, 110));
+        this.getProtocolList().add(new Protocol(0x1F, 340));
     }
 
-    private int keepaliveId;
+    private long keepaliveId;
 
     @Override
-    public void write(PacketBuffer out) throws Exception {
-        out.writeVarIntToBuffer(this.keepaliveId);
+    public void write(PacketBuffer out, int protocol) throws Exception {
+        if(protocol >= 340) {
+            out.writeLong(this.keepaliveId);
+        } else {
+            out.writeVarIntToBuffer((int) this.keepaliveId);
+        }
     }
 
     @Override
-    public void read(PacketBuffer in) throws Exception {
-        this.keepaliveId = in.readVarIntFromBuffer();
+    public void read(PacketBuffer in, int protocol) throws Exception {
+        if(protocol >= 340) {
+            this.keepaliveId = in.readLong();
+        } else {
+            this.keepaliveId = in.readVarIntFromBuffer();
+        }
     }
 }

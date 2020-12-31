@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.PacketBuffer;
+import pl.venixpll.mc.packet.Protocol;
 
 @Data
 @NoArgsConstructor
@@ -14,7 +15,7 @@ import pl.venixpll.mc.packet.PacketBuffer;
 public class HandshakePacket extends Packet {
 
     {
-        this.setPacketID(0x00);
+        this.getProtocolList().add(new Protocol(0x00, 0));
     }
 
     private int protocolId;
@@ -23,7 +24,7 @@ public class HandshakePacket extends Packet {
     private int nextState;
 
     @Override
-    public void write(PacketBuffer out) throws Exception {
+    public void write(PacketBuffer out, int protocol) throws Exception {
         out.writeVarIntToBuffer(this.protocolId);
         out.writeString(this.host);
         out.writeShort(this.port);
@@ -31,7 +32,7 @@ public class HandshakePacket extends Packet {
     }
 
     @Override
-    public void read(PacketBuffer in) throws Exception {
+    public void read(PacketBuffer in, int protocol) throws Exception {
         this.protocolId = in.readVarIntFromBuffer();
         this.host = in.readStringFromBuffer(128);
         this.port = in.readShort();

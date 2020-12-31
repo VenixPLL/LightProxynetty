@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import pl.venixpll.mc.data.Position;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.PacketBuffer;
+import pl.venixpll.mc.packet.Protocol;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,7 +14,7 @@ import pl.venixpll.mc.packet.PacketBuffer;
 public class ClientPlayerPosLookPacket extends Packet {
 
     {
-        this.setPacketID(0x06);
+        this.getProtocolList().add(new Protocol(0x06, 47));
     }
 
     private Position position;
@@ -21,7 +22,7 @@ public class ClientPlayerPosLookPacket extends Packet {
     private boolean onGround;
 
     @Override
-    public void write(PacketBuffer out) throws Exception {
+    public void write(PacketBuffer out, int protocol) throws Exception {
         out.writeDouble(position.getX());
         out.writeDouble(position.getY());
         out.writeDouble(position.getZ());
@@ -31,7 +32,7 @@ public class ClientPlayerPosLookPacket extends Packet {
     }
 
     @Override
-    public void read(PacketBuffer in) throws Exception {
+    public void read(PacketBuffer in, int protocol) throws Exception {
         this.position = new Position();
         position.setX(in.readDouble());
         position.setY(in.readDouble());

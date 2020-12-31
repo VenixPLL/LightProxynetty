@@ -2,6 +2,7 @@ package pl.venixpll.mc.packet.impl.client;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import pl.venixpll.LightProxy;
 import pl.venixpll.mc.objects.Player;
 import pl.venixpll.mc.packet.INetHandler;
 import pl.venixpll.mc.packet.Packet;
@@ -24,14 +25,16 @@ public class NetHandlerPlayServer implements INetHandler {
     @Override
     public void handlePacket(Packet packet) {
         if(packet instanceof ClientKeepAlivePacket){
-            final int time = ((ClientKeepAlivePacket) packet).getTime();
+            final long time = ((ClientKeepAlivePacket) packet).getTime();
             player.setPing((int) (System.currentTimeMillis() - time));
         }else if(packet instanceof ClientChatPacket){
             final String message = ((ClientChatPacket) packet).getMessage();
             if(message.startsWith(",")){
                 CommandManager.onCommand(message,player);
-            }else{
-               forwardPacket(packet);
+            } else if (message.startsWith("@")) {
+                LightProxy.getServer().getPlayerList().forEach(p -> p.sendChatMessageNoPrefix("&6" + player.getUsername() + " &8» &e" + message.substring(1)));
+            } else{
+                forwardPacket(packet);
             }
         }else{
             forwardPacket(packet);
@@ -39,16 +42,17 @@ public class NetHandlerPlayServer implements INetHandler {
     }
 
     private void forwardPacket(final Packet packet){
-        if(player.getConnector() != null && player.getConnector().isConnected()){
+        if(player.isConnected()){
             if(player.isMother()){
                 player.getBots().forEach(bot -> {
-                    if(bot.getConnection().isConnected()) {
+                    if(bot.isConnected()) {
                         //TODO add Entity Action exclude;
-                        bot.getConnection().sendPacket(packet);
+                        bot.getSession().sendPacket(packet);
                     }
                 });
             }
-            player.getConnector().sendPacket(packet);
+            if (!(packet instanceof ClientKeepAlivePacket))
+                player.getRemoteSession().sendPacket(packet);
         }
     }
 }

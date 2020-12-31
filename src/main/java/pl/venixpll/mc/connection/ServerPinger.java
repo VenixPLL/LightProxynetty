@@ -16,6 +16,7 @@ import pl.venixpll.mc.data.status.ServerStatusInfo;
 import pl.venixpll.mc.netty.NettyPacketCodec;
 import pl.venixpll.mc.netty.NettyVarInt21FrameCodec;
 import pl.venixpll.mc.objects.Player;
+import pl.venixpll.mc.objects.Session;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.impl.client.status.ClientStatusRequestPacket;
 import pl.venixpll.mc.packet.impl.handshake.HandshakePacket;
@@ -28,13 +29,11 @@ import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Data
-public class ServerPinger implements IConnector{
+public class ServerPinger {
 
     private final Player owner;
     private final boolean showResult;
-    private final IConnector otherConnection;
-
-    private Channel channel;
+    private Session session;
 
     private final LazyLoadBase<NioEventLoopGroup> CLIENT_NIO_EVENT_LOOP_PING = new LazyLoadBase<NioEventLoopGroup>() {
         @Override
@@ -43,7 +42,6 @@ public class ServerPinger implements IConnector{
         }
     };
 
-    @Override
     public void connect(String host, int port, Proxy proxy) {
         final Bootstrap bootstrap  = new Bootstrap()
                 .group(CLIENT_NIO_EVENT_LOOP_PING.getValue())
@@ -65,8 +63,8 @@ public class ServerPinger implements IConnector{
                                     owner.sendChatMessage("&aPinging...");
                                 }
                                 TimeUnit.MILLISECONDS.sleep(150);
-                                sendPacket(new HandshakePacket(47,host,port,1));
-                                sendPacket(new ClientStatusRequestPacket());
+                                session.sendPacket(new HandshakePacket(session.getProtocolID(),host,port,1));
+                                session.sendPacket(new ClientStatusRequestPacket());
                             }
 
                             @Override
@@ -78,23 +76,17 @@ public class ServerPinger implements IConnector{
                                         owner.sendChatMessage("&6Motd&8: &f" + info.getDescription().getFullText());
                                         owner.sendChatMessage("&6Version&8: &6%s &8(&f%s&8)", info.getVersion().getProtocol(), info.getVersion().getName());
                                     }
-                                    channel.close();
-                                    if(otherConnection != null){
-                                        otherConnection.connect(host,port,proxy);
-                                    }
+                                    session.getChannel().close();
                                 }else if(packet instanceof ServerStatusPongPacket){
-                                    channel.close();
+                                    session.getChannel().close();
                                 }
                             }
                         });
                     }
                 });
-        this.channel = bootstrap.connect(host, port).syncUninterruptibly().channel();
-        this.channel.config().setOption(ChannelOption.TCP_NODELAY, true);
-        this.channel.config().setOption(ChannelOption.IP_TOS, 0x18);
-    }
-
-    public void sendPacket(final Packet packet){
-        this.channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+        session = new Session(bootstrap.connect(host, port).syncUninterruptibly().channel());
+        session.setProtocolID(owner.getSession().getProtocolID());
+        session.getChannel().config().setOption(ChannelOption.TCP_NODELAY, true);
+        session.getChannel().config().setOption(ChannelOption.IP_TOS, 0x18);
     }
 }

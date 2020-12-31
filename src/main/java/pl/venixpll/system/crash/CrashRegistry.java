@@ -41,7 +41,7 @@ public class CrashRegistry {
         if(args[1].equalsIgnoreCase("list")){
             crashList.forEach(c -> sender.sendChatMessage("&c,crash %s <amount> &8- &6%s",c.getName(),c.getCrashType().name()));
         }else {
-            if (sender.getConnector() != null && sender.getConnector().isConnected()) {
+            if (sender.isConnected()) {
 
                 final Optional<Crash> crashOptional = crashList.stream().filter(c -> c.getName().equalsIgnoreCase(args[1])).findFirst();
                 if (crashOptional.isPresent()) {

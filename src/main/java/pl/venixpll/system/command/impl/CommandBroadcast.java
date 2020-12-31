@@ -17,8 +17,8 @@ public class CommandBroadcast extends Command {
             sender.sendChatMessage("&cYou do not have any bots!");
         }else{
             sender.getBots().forEach(bot -> {
-                if(bot.getConnection().isConnected()){
-                    bot.getConnection().sendPacket(new ClientChatPacket(message));
+                if(bot.isConnected()){
+                    bot.getSession().sendPacket(new ClientChatPacket(message));
                 }
             });
             sender.sendChatMessage("&cSent message!");

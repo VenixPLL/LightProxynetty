@@ -11,8 +11,8 @@ public class CommandTps extends Command {
 
     @Override
     public void onExecute(String cmd, Player sender) throws Exception {
-        if(sender.getConnector() != null && sender.getConnector().isConnected()){
-            sender.sendChatMessage("&6TPS&8: &c" + sender.getConnector().getLastTps());
+        if(sender.isConnected()){
+            sender.sendChatMessage("&6TPS&8: &c" + sender.getLastTps());
         }else{
             sender.sendChatMessage("&cYou have to be connected!");
         }

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.PacketBuffer;
+import pl.venixpll.mc.packet.Protocol;
 
 @Data
 @NoArgsConstructor
@@ -12,18 +13,19 @@ import pl.venixpll.mc.packet.PacketBuffer;
 public class ClientStatusPacket extends Packet {
 
     {
-        this.setPacketID(0x16);
+        this.getProtocolList().add(new Protocol(0x16, 47));
+        this.getProtocolList().add(new Protocol(0x03, 340));
     }
 
     private int actionId;
 
     @Override
-    public void write(PacketBuffer out) throws Exception {
+    public void write(PacketBuffer out, int protocol) throws Exception {
         out.writeVarIntToBuffer(actionId);
     }
 
     @Override
-    public void read(PacketBuffer in) throws Exception {
+    public void read(PacketBuffer in, int protocol) throws Exception {
         this.actionId = in.readVarIntFromBuffer();
     }
 }

@@ -1,11 +1,8 @@
 package com.mojang.authlib.properties;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.security.SignatureException;
 import org.apache.commons.codec.binary.Base64;
+
+import java.security.*;
 
 public class Property {
     private final String name;

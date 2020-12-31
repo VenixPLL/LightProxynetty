@@ -1,5 +1,9 @@
 package com.darkmagician6.eventapi;
 
+import com.darkmagician6.eventapi.events.Event;
+import com.darkmagician6.eventapi.events.EventStoppable;
+import com.darkmagician6.eventapi.types.Priority;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -7,10 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import com.darkmagician6.eventapi.events.Event;
-import com.darkmagician6.eventapi.events.EventStoppable;
-import com.darkmagician6.eventapi.types.Priority;
 
 /**
  * 
@@ -53,7 +53,6 @@ public final class EventManager {
      *
      * @param object
      *         Object that contains the Method you want to register.
-     * @param Parameter
      *         class for the marked method we are looking for.
      */
     public static void register(Object object, Class<? extends Event> eventClass) {
@@ -89,7 +88,6 @@ public final class EventManager {
      *
      * @param object
      *         Object that implements the Listener interface.
-     * @param Parameter
      *         class for the method to remove.
      */
     public static void unregister(Object object, Class<? extends Event> eventClass) {
@@ -217,7 +215,6 @@ public final class EventManager {
      *
      * @param method
      *         Method to check.
-     * @param Class
      *         of the Event we want to find a method for receiving it.
      *
      * @return True if the method should not be used for receiving event calls from the Dispatcher.

@@ -1,11 +1,11 @@
 package net.minecraft.nbt;
 
-import java.util.Iterator;
-import java.util.UUID;
-
 import com.mojang.authlib.properties.Property;
 import pl.venixpll.mc.objects.GameProfile;
 import pl.venixpll.utils.StringUtils;
+
+import java.util.Iterator;
+import java.util.UUID;
 
 public final class NBTUtil
 {

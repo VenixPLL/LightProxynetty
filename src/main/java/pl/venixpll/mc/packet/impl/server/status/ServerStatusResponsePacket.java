@@ -14,6 +14,7 @@ import pl.venixpll.mc.data.status.VersionInfo;
 import pl.venixpll.mc.objects.GameProfile;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.PacketBuffer;
+import pl.venixpll.mc.packet.Protocol;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -24,7 +25,9 @@ import java.util.UUID;
 public class ServerStatusResponsePacket extends Packet {
 
     {
-        this.setPacketID(0x00);
+        this.getProtocolList().add(new Protocol(0x00, 47));
+        this.getProtocolList().add(new Protocol(0x00, 110));
+        this.getProtocolList().add(new Protocol(0x00, 340));
     }
 
     private static final Gson gson = new GsonBuilder().create();
@@ -32,7 +35,7 @@ public class ServerStatusResponsePacket extends Packet {
     private ServerStatusInfo statusInfo;
 
     @Override
-    public void write(PacketBuffer packetBuffer) {
+    public void write(PacketBuffer packetBuffer, int protocol) {
         final JsonObject jsonObject = new JsonObject();
         final JsonObject version = new JsonObject();
 
@@ -63,7 +66,7 @@ public class ServerStatusResponsePacket extends Packet {
     }
 
     @Override
-    public void read(PacketBuffer packetBuffer) {
+    public void read(PacketBuffer packetBuffer, int protocol) {
         final JsonObject jsonObject = gson.fromJson(packetBuffer.readStringFromBuffer(32767), JsonObject.class);
         final JsonObject version = jsonObject.get("version").getAsJsonObject();
         final VersionInfo versionInfo = new VersionInfo(version.get("name").getAsString(), version.get("protocol").getAsInt());
