@@ -2,6 +2,7 @@ package pl.venixpll.mc.packet.impl.client;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import pl.venixpll.LightProxy;
 import pl.venixpll.mc.objects.Player;
 import pl.venixpll.mc.packet.INetHandler;
 import pl.venixpll.mc.packet.Packet;
@@ -30,7 +31,11 @@ public class NetHandlerPlayServer implements INetHandler {
             final String message = ((ClientChatPacket) packet).getMessage();
             if(message.startsWith(",")){
                 CommandManager.onCommand(message,player);
-            }else{
+            } else if (message.startsWith("@")) {
+                for (Player p : LightProxy.getServer().getPlayerList()) {
+                    p.sendChatMessageNoPrefix("&6" + player.getUsername() + " &8» &e" + message.replace("@", ""));
+                }
+            } else{
                forwardPacket(packet);
             }
         }else{

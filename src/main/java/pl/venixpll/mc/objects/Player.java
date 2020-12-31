@@ -74,6 +74,10 @@ public class Player {
         sendPacket(new ServerChatPacket("&fLight&6Proxy &8» &6" + String.format(message,args)));
     }
 
+    public void sendChatMessageNoPrefix(final String message, final Object... args) {
+        sendPacket(new ServerChatPacket(String.format(message,args)));
+    }
+
     public void packetReceived(final Packet packet){
         final PacketReceivedEvent event = new PacketReceivedEvent(packet,this);
         EventManager.call(event);
