@@ -12,7 +12,7 @@ public class CommandQuit extends Command {
     @Override
     public void onExecute(String cmd, Player sender) throws Exception {
         final String[] args = cmd.split(" ");
-        if(args.length > 0){
+        if(args.length >= 2){
             if(args[1].equalsIgnoreCase("bots")){
                 if(sender.getBots().isEmpty()){
                     sender.sendChatMessage("&cYou do not have any bots!");
