@@ -61,7 +61,7 @@ public class LogUtil {
 
                 final String level = record.getLevel() == Level.SEVERE ? "ERROR" : record.getLevel() == Level.WARNING ? "WARN" : "INFO";
 
-                return date.format(record.getMillis()) + " [" + level + "/" + Thread.currentThread().getName() + "] " + formatMessage(record) + System.lineSeparator();
+                return date.format(record.getMillis()) + " [" + level + "/" + Thread.currentThread().getName() + "] " + formatMessage(record);
             }
         });
 
