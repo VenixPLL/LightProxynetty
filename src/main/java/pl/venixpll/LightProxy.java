@@ -61,7 +61,7 @@ public class LightProxy {
         }
         final VersionInfo versionInfo = new VersionInfo(LogUtil.fixColor("&fLight&6Proxy"),399);
         final PlayerInfo playerInfo = new PlayerInfo(0,0);
-        final Message desc = Message.fromString(LogUtil.fixColor("&fLight&6Proxy &8» &6Wersja &c0.1 &6SHIT\n&fLight&6Proxy &8» &6Nie polecam chujowe proksi"));
+        final Message desc = Message.fromString(LogUtil.fixColor("&fLight&6Proxy &8» &6Version &c0.1 &6SHIT\n&fLight&6Proxy &8» &6Some text"));
         server.setStatusInfo(new ServerStatusInfo(versionInfo,playerInfo,desc, statusFile.exists() ? ImageUtil.iconToString(bufferedImage) : null));
     }
 
