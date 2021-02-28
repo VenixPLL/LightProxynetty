@@ -5,11 +5,11 @@ import pl.venixpll.mc.packet.PacketBuffer;
 
 public class ServerLoginEncryptionRequestPacket extends Packet {
 
+    private byte[] data;
+
     {
         this.setPacketID(0x01);
     }
-
-    private byte[] data;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

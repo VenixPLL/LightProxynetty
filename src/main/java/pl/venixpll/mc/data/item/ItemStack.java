@@ -2,8 +2,7 @@ package pl.venixpll.mc.data.item;
 
 import net.minecraft.nbt.NBTTagCompound;
 
-public class ItemStack
-{
+public class ItemStack {
     private int id;
     private int amount;
     private int data;

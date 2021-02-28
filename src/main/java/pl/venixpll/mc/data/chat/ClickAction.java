@@ -8,8 +8,8 @@ public enum ClickAction {
 
     public static ClickAction byName(String name) {
         name = name.toLowerCase();
-        for(ClickAction action : values()) {
-            if(action.toString().equals(name)) {
+        for (ClickAction action : values()) {
+            if (action.toString().equals(name)) {
                 return action;
             }
         }

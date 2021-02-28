@@ -23,88 +23,88 @@ import java.util.HashMap;
 public class PacketRegistry {
 
     private static HashMap<Integer, Packet> CLIENT_STATUS = new HashMap<>();
-    private static HashMap<Integer,Packet> CLIENT_LOGIN = new HashMap<>();
-    private static HashMap<Integer,Packet> CLIENT_PLAY = new HashMap<>();
+    private static HashMap<Integer, Packet> CLIENT_LOGIN = new HashMap<>();
+    private static HashMap<Integer, Packet> CLIENT_PLAY = new HashMap<>();
 
-    private static HashMap<Integer,Packet> SERVER_STATUS = new HashMap<>();
-    private static HashMap<Integer,Packet> SERVER_LOGIN = new HashMap<>();
-    private static HashMap<Integer,Packet> SERVER_PLAY = new HashMap<>();
+    private static HashMap<Integer, Packet> SERVER_STATUS = new HashMap<>();
+    private static HashMap<Integer, Packet> SERVER_LOGIN = new HashMap<>();
+    private static HashMap<Integer, Packet> SERVER_PLAY = new HashMap<>();
 
-    public static void registerPacket(EnumConnectionState connectionState, EnumPacketDirection direction, Packet packet){
+    public static void registerPacket(EnumConnectionState connectionState, EnumPacketDirection direction, Packet packet) {
         final int packetId = packet.getPacketID();
-        switch(direction){
+        switch (direction) {
             case SERVERBOUND:
-                switch(connectionState){
+                switch (connectionState) {
                     case HANDSHAKE:
                         throw new IllegalArgumentException("Cannot add handshakePacket!");
                     case LOGIN:
-                        CLIENT_LOGIN.put(packetId,packet);
+                        CLIENT_LOGIN.put(packetId, packet);
                         break;
                     case PLAY:
-                        CLIENT_PLAY.put(packetId,packet);
+                        CLIENT_PLAY.put(packetId, packet);
                         break;
                     case STATUS:
-                        CLIENT_STATUS.put(packetId,packet);
+                        CLIENT_STATUS.put(packetId, packet);
                         break;
                 }
                 break;
             case CLIENTBOUND:
-                switch(connectionState){
+                switch (connectionState) {
                     case HANDSHAKE:
                         throw new IllegalArgumentException("Cannot add handshakePacket to CLIENTBOUND!");
                     case LOGIN:
-                        SERVER_LOGIN.put(packetId,packet);
+                        SERVER_LOGIN.put(packetId, packet);
                         break;
                     case PLAY:
-                        SERVER_PLAY.put(packetId,packet);
+                        SERVER_PLAY.put(packetId, packet);
                         break;
                     case STATUS:
-                        SERVER_STATUS.put(packetId,packet);
+                        SERVER_STATUS.put(packetId, packet);
                         break;
                 }
                 break;
         }
     }
 
-    public static void load(){
+    public static void load() {
         //CLIENT //CLIENT //CLIENT //CLIENT //CLIENT //CLIENT //CLIENT //CLIENT //CLIENT //CLIENT //CLIENT //CLIENT
-            //STATUS
-        registerPacket(EnumConnectionState.STATUS,EnumPacketDirection.SERVERBOUND,new ClientStatusRequestPacket());
-        registerPacket(EnumConnectionState.STATUS,EnumPacketDirection.SERVERBOUND,new ClientStatusPingPacket());
-            //LOGIN
-        registerPacket(EnumConnectionState.LOGIN,EnumPacketDirection.SERVERBOUND,new ClientLoginStartPacket());
-            //PLAY
-        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.SERVERBOUND,new ClientKeepAlivePacket());
-        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.SERVERBOUND,new ClientChatPacket());
-        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.SERVERBOUND,new ClientCreativeInventoryAction());
-        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.SERVERBOUND,new ClientEntityActionPacket());
-        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.SERVERBOUND,new ClientPluginMessagePacket());
+        //STATUS
+        registerPacket(EnumConnectionState.STATUS, EnumPacketDirection.SERVERBOUND, new ClientStatusRequestPacket());
+        registerPacket(EnumConnectionState.STATUS, EnumPacketDirection.SERVERBOUND, new ClientStatusPingPacket());
+        //LOGIN
+        registerPacket(EnumConnectionState.LOGIN, EnumPacketDirection.SERVERBOUND, new ClientLoginStartPacket());
+        //PLAY
+        registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.SERVERBOUND, new ClientKeepAlivePacket());
+        registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.SERVERBOUND, new ClientChatPacket());
+        registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.SERVERBOUND, new ClientCreativeInventoryAction());
+        registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.SERVERBOUND, new ClientEntityActionPacket());
+        registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.SERVERBOUND, new ClientPluginMessagePacket());
         //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER //SERVER
-            //STATUS
-        registerPacket(EnumConnectionState.STATUS,EnumPacketDirection.CLIENTBOUND,new ServerStatusResponsePacket());
-        registerPacket(EnumConnectionState.STATUS,EnumPacketDirection.CLIENTBOUND,new ServerStatusPongPacket());
-            //LOGIN
-        registerPacket(EnumConnectionState.LOGIN,EnumPacketDirection.CLIENTBOUND,new ServerLoginDisconnectPacket());
-        registerPacket(EnumConnectionState.LOGIN,EnumPacketDirection.CLIENTBOUND,new ServerLoginSetCompressionPacket());
-        registerPacket(EnumConnectionState.LOGIN,EnumPacketDirection.CLIENTBOUND,new ServerLoginEncryptionRequestPacket());
-        registerPacket(EnumConnectionState.LOGIN,EnumPacketDirection.CLIENTBOUND,new ServerLoginSuccessPacket());
-            //PLAY
-        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.CLIENTBOUND,new ServerJoinGamePacket());// 0x01
-        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.CLIENTBOUND,new ServerKeepAlivePacket());// 0x00
-        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.CLIENTBOUND,new ServerDisconnectPacket());
-        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.CLIENTBOUND,new ServerTimeUpdatePacket());
-        registerPacket(EnumConnectionState.PLAY,EnumPacketDirection.CLIENTBOUND,new ServerChatPacket());
+        //STATUS
+        registerPacket(EnumConnectionState.STATUS, EnumPacketDirection.CLIENTBOUND, new ServerStatusResponsePacket());
+        registerPacket(EnumConnectionState.STATUS, EnumPacketDirection.CLIENTBOUND, new ServerStatusPongPacket());
+        //LOGIN
+        registerPacket(EnumConnectionState.LOGIN, EnumPacketDirection.CLIENTBOUND, new ServerLoginDisconnectPacket());
+        registerPacket(EnumConnectionState.LOGIN, EnumPacketDirection.CLIENTBOUND, new ServerLoginSetCompressionPacket());
+        registerPacket(EnumConnectionState.LOGIN, EnumPacketDirection.CLIENTBOUND, new ServerLoginEncryptionRequestPacket());
+        registerPacket(EnumConnectionState.LOGIN, EnumPacketDirection.CLIENTBOUND, new ServerLoginSuccessPacket());
+        //PLAY
+        registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.CLIENTBOUND, new ServerJoinGamePacket());// 0x01
+        registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.CLIENTBOUND, new ServerKeepAlivePacket());// 0x00
+        registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.CLIENTBOUND, new ServerDisconnectPacket());
+        registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.CLIENTBOUND, new ServerTimeUpdatePacket());
+        registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.CLIENTBOUND, new ServerChatPacket());
     }
 
 
-    public static Packet getPacket(EnumConnectionState connectionState, EnumPacketDirection direction, int id){
-        return getNewInstance(getPacketA(connectionState,direction,id));
+    public static Packet getPacket(EnumConnectionState connectionState, EnumPacketDirection direction, int id) {
+        return getNewInstance(getPacketA(connectionState, direction, id));
     }
 
-    private static Packet getPacketA(EnumConnectionState connectionState, EnumPacketDirection direction, int id){
-        switch(direction){
+    private static Packet getPacketA(EnumConnectionState connectionState, EnumPacketDirection direction, int id) {
+        switch (direction) {
             case SERVERBOUND:
-                switch(connectionState){
+                switch (connectionState) {
                     case HANDSHAKE:
                         return new HandshakePacket();
                     case LOGIN:
@@ -116,7 +116,7 @@ public class PacketRegistry {
                 }
                 break;
             case CLIENTBOUND:
-                switch(connectionState){
+                switch (connectionState) {
                     case LOGIN:
                         return SERVER_LOGIN.get(id);
                     case PLAY:
@@ -130,8 +130,8 @@ public class PacketRegistry {
         return null;
     }
 
-    private static Packet getNewInstance(final Packet packetIn){
-        if(packetIn == null) return null;
+    private static Packet getNewInstance(final Packet packetIn) {
+        if (packetIn == null) return null;
         Class<? extends Packet> packet = packetIn.getClass();
         try {
             Constructor<? extends Packet> constructor = packet.getDeclaredConstructor();
@@ -140,7 +140,7 @@ public class PacketRegistry {
             }
 
             return constructor.newInstance();
-        }catch(Exception e) {
+        } catch (Exception e) {
             throw new IllegalStateException("Failed to instantiate packet \"" + packetIn.getPacketID() + ", " + packet.getName() + "\".", e);
         }
     }

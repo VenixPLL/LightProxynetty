@@ -11,11 +11,11 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @Data
 public class ClientChatPacket extends Packet {
 
+    private String message;
+
     {
         this.setPacketID(0x01);
     }
-
-    private String message;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

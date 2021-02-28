@@ -1,6 +1,5 @@
 package pl.venixpll.mc.packet.impl.server.play;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.venixpll.mc.data.chat.Message;
@@ -12,13 +11,13 @@ import pl.venixpll.utils.LogUtil;
 @Data
 public class ServerPlayerListHeaderFooter extends Packet {
 
+    private Message header, footer;
+
     {
         this.setPacketID(0x47);
     }
 
-    private Message header,footer;
-
-    public ServerPlayerListHeaderFooter(String header,String footer){
+    public ServerPlayerListHeaderFooter(String header, String footer) {
         this.header = Message.fromString(LogUtil.fixColor(header));
         this.footer = Message.fromString(LogUtil.fixColor(footer));
     }

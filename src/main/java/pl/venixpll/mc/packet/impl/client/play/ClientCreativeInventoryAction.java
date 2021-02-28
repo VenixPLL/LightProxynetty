@@ -12,13 +12,12 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @Data
 public class ClientCreativeInventoryAction extends Packet {
 
-    {
-        this.setPacketID(0x10);
-    }
-
     private int slot;
     private ItemStack itemStack;
 
+    {
+        this.setPacketID(0x10);
+    }
 
     @Override
     public void write(PacketBuffer out) throws Exception {

@@ -10,13 +10,13 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @AllArgsConstructor
 @Data
 public class ServerPlayerSetExperiencePacket extends Packet {
-    {
-        this.setPacketID(0x1F);
-    }
-
     private float experience;
     private int level;
     private int totalExperience;
+
+    {
+        this.setPacketID(0x1F);
+    }
 
     @Override
     public void write(PacketBuffer out) throws Exception {

@@ -10,9 +10,8 @@ import java.util.UUID;
 @Data
 public class GameProfile {
 
+    private final PropertyMap properties = new PropertyMap();
     private String username;
     private UUID uuid;
-
-    private final PropertyMap properties = new PropertyMap();
 
 }

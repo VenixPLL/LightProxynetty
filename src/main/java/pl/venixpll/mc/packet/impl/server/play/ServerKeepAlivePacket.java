@@ -11,11 +11,11 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @Data
 public class ServerKeepAlivePacket extends Packet {
 
+    private int keepaliveId;
+
     {
         this.setPacketID(0x00);
     }
-
-    private int keepaliveId;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

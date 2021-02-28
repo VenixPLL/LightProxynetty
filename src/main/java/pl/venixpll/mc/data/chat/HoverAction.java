@@ -8,8 +8,8 @@ public enum HoverAction {
 
     public static HoverAction byName(String name) {
         name = name.toLowerCase();
-        for(HoverAction action : values()) {
-            if(action.toString().equals(name)) {
+        for (HoverAction action : values()) {
+            if (action.toString().equals(name)) {
                 return action;
             }
         }

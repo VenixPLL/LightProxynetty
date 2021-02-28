@@ -23,13 +23,12 @@ import java.util.UUID;
 @Getter
 public class ServerStatusResponsePacket extends Packet {
 
+    private static final Gson gson = new GsonBuilder().create();
+    private ServerStatusInfo statusInfo;
+
     {
         this.setPacketID(0x00);
     }
-
-    private static final Gson gson = new GsonBuilder().create();
-
-    private ServerStatusInfo statusInfo;
 
     @Override
     public void write(PacketBuffer packetBuffer) {
@@ -37,7 +36,7 @@ public class ServerStatusResponsePacket extends Packet {
         final JsonObject version = new JsonObject();
 
         String versioName = statusInfo.getVersion().getName();
-        version.addProperty("name",versioName);
+        version.addProperty("name", versioName);
         version.addProperty("protocol", statusInfo.getVersion().getProtocol());
         final JsonObject players = new JsonObject();
         players.addProperty("max", statusInfo.getPlayers().getMaxPlayers());
@@ -76,7 +75,7 @@ public class ServerStatusResponsePacket extends Packet {
                 gameProfiles = new GameProfile[profiles.size()];
                 for (int index = 0; index < profiles.size(); index++) {
                     final JsonObject jsonObject1 = profiles.get(index).getAsJsonObject();
-                    gameProfiles[index] = new GameProfile(jsonObject1.get("name").getAsString(),UUID.fromString(jsonObject1.get("id").getAsString()));
+                    gameProfiles[index] = new GameProfile(jsonObject1.get("name").getAsString(), UUID.fromString(jsonObject1.get("id").getAsString()));
                 }
             }
         }

@@ -11,11 +11,11 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @Data
 public class ServerStatusPongPacket extends Packet {
 
+    private long time;
+
     {
         this.setPacketID(0x01);
     }
-
-    private long time;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

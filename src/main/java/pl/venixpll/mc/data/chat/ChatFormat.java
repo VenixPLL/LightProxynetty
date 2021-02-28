@@ -9,8 +9,8 @@ public enum ChatFormat {
 
     public static ChatFormat byName(String name) {
         name = name.toLowerCase();
-        for(ChatFormat format : values()) {
-            if(format.toString().equals(name)) {
+        for (ChatFormat format : values()) {
+            if (format.toString().equals(name)) {
                 return format;
             }
         }

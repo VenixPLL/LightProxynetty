@@ -19,33 +19,33 @@ public class NetHandlerPlayServer implements INetHandler {
 
     @Override
     public void disconnected() {
-        LogUtil.printMessage("[%s] Disconnected.",player.getUsername());
+        LogUtil.printMessage("[%s] Disconnected.", player.getUsername());
     }
 
     @Override
     public void handlePacket(Packet packet) {
-        if(packet instanceof ClientKeepAlivePacket){
+        if (packet instanceof ClientKeepAlivePacket) {
             final int time = ((ClientKeepAlivePacket) packet).getTime();
             player.setPing((int) (System.currentTimeMillis() - time));
-        }else if(packet instanceof ClientChatPacket){
+        } else if (packet instanceof ClientChatPacket) {
             final String message = ((ClientChatPacket) packet).getMessage();
-            if(message.startsWith(",")){
-                CommandManager.onCommand(message,player);
+            if (message.startsWith(",")) {
+                CommandManager.onCommand(message, player);
             } else if (message.startsWith("@")) {
                 LightProxy.getServer().getPlayerList().forEach(p -> p.sendChatMessageNoPrefix("&6" + player.getUsername() + " &8» &e" + message.substring(1)));
-            } else{
-               forwardPacket(packet);
+            } else {
+                forwardPacket(packet);
             }
-        }else{
+        } else {
             forwardPacket(packet);
         }
     }
 
-    private void forwardPacket(final Packet packet){
-        if(player.getConnector() != null && player.getConnector().isConnected()){
-            if(player.isMother()){
+    private void forwardPacket(final Packet packet) {
+        if (player.getConnector() != null && player.getConnector().isConnected()) {
+            if (player.isMother()) {
                 player.getBots().forEach(bot -> {
-                    if(bot.getConnection().isConnected()) {
+                    if (bot.getConnection().isConnected()) {
                         //TODO add Entity Action exclude;
                         bot.getConnection().sendPacket(packet);
                     }

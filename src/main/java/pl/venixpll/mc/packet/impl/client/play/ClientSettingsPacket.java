@@ -11,15 +11,15 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @Data
 public class ClientSettingsPacket extends Packet {
 
-    {
-        this.setPacketID(0x15);
-    }
-
     private String locale;
     private byte viewDistance;
     private byte chatMode;
     private boolean chatColors;
     private byte skinParts;
+
+    {
+        this.setPacketID(0x15);
+    }
 
     @Override
     public void write(PacketBuffer out) throws Exception {

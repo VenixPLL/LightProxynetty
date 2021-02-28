@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class Position {
 
-    private double x,y,z;
+    private double x, y, z;
 
 }

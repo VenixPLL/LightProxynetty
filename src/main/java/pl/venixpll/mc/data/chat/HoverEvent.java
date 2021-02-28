@@ -27,8 +27,8 @@ public class HoverEvent implements Cloneable {
 
     @Override
     public boolean equals(Object o) {
-        if(this == o) return true;
-        if(!(o instanceof HoverEvent)) return false;
+        if (this == o) return true;
+        if (!(o instanceof HoverEvent)) return false;
 
         HoverEvent that = (HoverEvent) o;
         return this.action == that.action &&

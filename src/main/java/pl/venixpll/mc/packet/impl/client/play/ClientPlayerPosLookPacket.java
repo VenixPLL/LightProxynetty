@@ -12,13 +12,13 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @Data
 public class ClientPlayerPosLookPacket extends Packet {
 
+    private Position position;
+    private float yaw, pitch;
+    private boolean onGround;
+
     {
         this.setPacketID(0x06);
     }
-
-    private Position position;
-    private float yaw,pitch;
-    private boolean onGround;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

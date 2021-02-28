@@ -11,12 +11,12 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @Data
 public class ServerTimeUpdatePacket extends Packet {
 
+    private long worldAge;
+    private long dayTime;
+
     {
         this.setPacketID(0x03);
     }
-
-    private long worldAge;
-    private long dayTime;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

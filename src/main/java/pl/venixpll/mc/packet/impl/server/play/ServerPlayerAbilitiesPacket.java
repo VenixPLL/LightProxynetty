@@ -11,11 +11,12 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @Data
 public class ServerPlayerAbilitiesPacket extends Packet {
 
+    private boolean damage, flying, allowFlying, creative;
+    private float flySpeed, walkSpeed;
+
     {
         this.setPacketID(0x39);
     }
-    private boolean damage, flying, allowFlying, creative;
-    private float flySpeed, walkSpeed;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

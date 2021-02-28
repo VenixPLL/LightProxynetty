@@ -12,21 +12,20 @@ import pl.venixpll.utils.LogUtil;
 @Data
 public class ServerChatPacket extends Packet {
 
+    private Message message;
+    private MessagePosition position;
+
     {
         this.setPacketID(0x02);
     }
 
-    public ServerChatPacket(String message){
+    public ServerChatPacket(String message) {
         this(message, MessagePosition.CHATBOX);
     }
-
-    public ServerChatPacket(String message,MessagePosition position){
-      this.message = Message.fromString(LogUtil.fixColor(message));
-      this.position = position;
+    public ServerChatPacket(String message, MessagePosition position) {
+        this.message = Message.fromString(LogUtil.fixColor(message));
+        this.position = position;
     }
-
-    private Message message;
-    private MessagePosition position;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

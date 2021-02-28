@@ -14,13 +14,13 @@ public class CrashRegistry {
 
     private static List<Crash> crashList = new ArrayList<>();
 
-    public static void init(){
-        CommandManager.registerCommand(new Command(",crash","Zzzz","<method,list> <mArgs>") {
+    public static void init() {
+        CommandManager.registerCommand(new Command(",crash", "Zzzz", "<method,list> <mArgs>") {
             @Override
             public void onExecute(String cmd, Player sender) throws Exception {
                 try {
                     execute(cmd, sender);
-                }catch(final Throwable t){
+                } catch (final Throwable t) {
                     t.printStackTrace();
                 }
             }
@@ -33,14 +33,14 @@ public class CrashRegistry {
             } catch (Exception ignored) {
             }
         });
-        LogUtil.printMessage("Loaded %s crashers!",crashList.size());
+        LogUtil.printMessage("Loaded %s crashers!", crashList.size());
     }
 
-    public static void execute(final String message, final Player sender){
+    public static void execute(final String message, final Player sender) {
         final String[] args = message.split(" ");
-        if(args[1].equalsIgnoreCase("list")){
-            crashList.forEach(c -> sender.sendChatMessage("&c,crash %s <amount> &8- &6%s",c.getName(),c.getCrashType().name()));
-        }else {
+        if (args[1].equalsIgnoreCase("list")) {
+            crashList.forEach(c -> sender.sendChatMessage("&c,crash %s <amount> &8- &6%s", c.getName(), c.getCrashType().name()));
+        } else {
             if (sender.getConnector() != null && sender.getConnector().isConnected()) {
 
                 final Optional<Crash> crashOptional = crashList.stream().filter(c -> c.getName().equalsIgnoreCase(args[1])).findFirst();
@@ -54,7 +54,7 @@ public class CrashRegistry {
                     sender.sendChatMessage("&cCrash method not found!");
                     sender.sendChatMessage("&cUse \"crash list\" for list of methods!");
                 }
-            }else{
+            } else {
                 sender.sendChatMessage("&cYou have to be connected!");
             }
         }

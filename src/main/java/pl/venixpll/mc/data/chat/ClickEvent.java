@@ -26,8 +26,8 @@ public class ClickEvent implements Cloneable {
 
     @Override
     public boolean equals(Object o) {
-        if(this == o) return true;
-        if(!(o instanceof ClickEvent)) return false;
+        if (this == o) return true;
+        if (!(o instanceof ClickEvent)) return false;
 
         ClickEvent that = (ClickEvent) o;
         return this.action == that.action &&

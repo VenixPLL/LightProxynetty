@@ -18,14 +18,15 @@ public class NetHandlerStatusServer implements INetHandler {
     private final Player owner;
 
     @Override
-    public void disconnected() {}
+    public void disconnected() {
+    }
 
     @Override
     public void handlePacket(Packet packet) {
-        if(packet instanceof ClientStatusRequestPacket){
+        if (packet instanceof ClientStatusRequestPacket) {
             owner.sendPacket(new ServerStatusResponsePacket(LightProxy.getServer().getStatusInfo()));
             owner.getChannel().close();
-        }else if(packet instanceof ClientStatusPingPacket){
+        } else if (packet instanceof ClientStatusPingPacket) {
             owner.sendPacket(new ServerStatusPongPacket(((ClientStatusPingPacket) packet).getTime()));
             owner.getChannel().close();
         }

@@ -14,15 +14,14 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @Getter
 public class ServerRespawnPacket extends Packet {
 
-    {
-        this.setPacketID(0x07);
-    }
-
     private Dimension dimension;
     private Difficulty difficulty;
     private Gamemode gamemode;
     private String level_type;
 
+    {
+        this.setPacketID(0x07);
+    }
 
     @Override
     public void write(PacketBuffer out) throws Exception {

@@ -13,12 +13,12 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ServerLoginSuccessPacket extends Packet {
 
+    private UUID uuid;
+    private String username;
+
     {
         this.setPacketID(0x02);
     }
-
-    private UUID uuid;
-    private String username;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

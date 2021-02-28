@@ -12,50 +12,48 @@ import pl.venixpll.utils.LogUtil;
 @Getter
 public class ServerTitlePacket extends Packet {
 
-    {
-        this.setPacketID(0x45);
-    }
-
     private TitleAction titleAction;
     private Message title;
     private Message subTitle;
-
     private int fadeIn;
     private int fadeOut;
     private int stay;
 
-    public ServerTitlePacket(TitleAction action, String message){
+    {
+        this.setPacketID(0x45);
+    }
+
+    public ServerTitlePacket(TitleAction action, String message) {
         this.titleAction = action;
-        if(action == TitleAction.TITLE){
+        if (action == TitleAction.TITLE) {
             this.title = Message.fromString(LogUtil.fixColor(message));
-        }else if(action == TitleAction.SUBTITLE){
+        } else if (action == TitleAction.SUBTITLE) {
             this.subTitle = Message.fromString(LogUtil.fixColor(message));
-        }else{
+        } else {
             throw new IllegalArgumentException("Illegal use of ServerTitlePacket!");
         }
     }
 
-    public ServerTitlePacket(TitleAction action,int fadeIn,int stay,int fadeOut){
+    public ServerTitlePacket(TitleAction action, int fadeIn, int stay, int fadeOut) {
         this.titleAction = action;
-        if(titleAction == TitleAction.TIMES){
+        if (titleAction == TitleAction.TIMES) {
             this.fadeIn = fadeIn;
             this.stay = stay;
             this.fadeOut = fadeOut;
-        }else{
+        } else {
             throw new IllegalArgumentException("Illegal use of ServerTitlePacket");
         }
     }
 
-    public ServerTitlePacket(TitleAction action){
+    public ServerTitlePacket(TitleAction action) {
         this.titleAction = action;
     }
-
 
 
     @Override
     public void write(PacketBuffer out) throws Exception {
         out.writeVarIntToBuffer(titleAction.getId());
-        switch(titleAction){
+        switch (titleAction) {
             case TITLE:
                 out.writeString(this.title.toJsonString());
                 break;
@@ -75,7 +73,7 @@ public class ServerTitlePacket extends Packet {
     @Override
     public void read(PacketBuffer in) throws Exception {
         this.titleAction = TitleAction.getById(in.readVarIntFromBuffer());
-        switch(titleAction){
+        switch (titleAction) {
             case TITLE:
                 this.title = Message.fromString(in.readStringFromBuffer(32767));
                 break;

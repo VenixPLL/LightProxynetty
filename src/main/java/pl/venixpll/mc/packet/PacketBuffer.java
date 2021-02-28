@@ -13,7 +13,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import pl.venixpll.mc.data.Position;
 import pl.venixpll.mc.data.item.ItemStack;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
@@ -23,90 +25,11 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-public class PacketBuffer extends ByteBuf
-{
+public class PacketBuffer extends ByteBuf {
     private final ByteBuf byteBuf;
 
     public PacketBuffer(final ByteBuf byteBuf) {
         this.byteBuf = byteBuf;
-    }
-
-
-    /**
-     * Writes a compressed NBTTagCompound to this buffer
-     */
-    public void writeNBTTagCompoundToBuffer(NBTTagCompound nbt)
-    {
-        if (nbt == null)
-        {
-            this.writeByte(0);
-        }
-        else
-        {
-            try
-            {
-                CompressedStreamTools.write(nbt, new ByteBufOutputStream(this));
-            }
-            catch (IOException var3)
-            {
-                throw new EncoderException(var3);
-            }
-        }
-    }
-
-    /**
-     * Reads a compressed NBTTagCompound from this buffer
-     */
-    public NBTTagCompound readNBTTagCompoundFromBuffer() throws IOException
-    {
-        int var1 = this.readerIndex();
-        byte var2 = this.readByte();
-
-        if (var2 == 0)
-        {
-            return null;
-        }
-        else
-        {
-            this.readerIndex(var1);
-            return CompressedStreamTools.func_152456_a(new ByteBufInputStream(this), new NBTSizeTracker(2097152L));
-        }
-    }
-
-    /**
-     * Writes the ItemStack's ID (short), then size (byte), then damage. (short)
-     */
-    public void writeItemStackToBuffer(ItemStack stack)
-    {
-        if (stack == null)
-        {
-            this.writeShort(-1);
-        }
-        else
-        {
-            this.writeShort(stack.getId());
-            this.writeByte(stack.getAmount());
-            this.writeShort(stack.getData());
-            this.writeNBTTagCompoundToBuffer(stack.getNBT());
-        }
-    }
-
-    /**
-     * Reads an ItemStack from this buffer
-     */
-    public ItemStack readItemStackFromBuffer() throws IOException
-    {
-        ItemStack var1 = null;
-        final short id = this.readShort();
-
-        if (id >= 0)
-        {
-            final byte amount = this.readByte();
-            final short data = this.readShort();
-            var1 = new ItemStack(id, amount, data,this.readNBTTagCompoundFromBuffer());
-        }
-
-        return var1;
     }
 
     public static int getVarIntSize(int input) {
@@ -117,6 +40,66 @@ public class PacketBuffer extends ByteBuf
         }
 
         return 5;
+    }
+
+    /**
+     * Writes a compressed NBTTagCompound to this buffer
+     */
+    public void writeNBTTagCompoundToBuffer(NBTTagCompound nbt) {
+        if (nbt == null) {
+            this.writeByte(0);
+        } else {
+            try {
+                CompressedStreamTools.write(nbt, new ByteBufOutputStream(this));
+            } catch (IOException var3) {
+                throw new EncoderException(var3);
+            }
+        }
+    }
+
+    /**
+     * Reads a compressed NBTTagCompound from this buffer
+     */
+    public NBTTagCompound readNBTTagCompoundFromBuffer() throws IOException {
+        int var1 = this.readerIndex();
+        byte var2 = this.readByte();
+
+        if (var2 == 0) {
+            return null;
+        } else {
+            this.readerIndex(var1);
+            return CompressedStreamTools.func_152456_a(new ByteBufInputStream(this), new NBTSizeTracker(2097152L));
+        }
+    }
+
+    /**
+     * Writes the ItemStack's ID (short), then size (byte), then damage. (short)
+     */
+    public void writeItemStackToBuffer(ItemStack stack) {
+        if (stack == null) {
+            this.writeShort(-1);
+        } else {
+            this.writeShort(stack.getId());
+            this.writeByte(stack.getAmount());
+            this.writeShort(stack.getData());
+            this.writeNBTTagCompoundToBuffer(stack.getNBT());
+        }
+    }
+
+    /**
+     * Reads an ItemStack from this buffer
+     */
+    public ItemStack readItemStackFromBuffer() throws IOException {
+        ItemStack var1 = null;
+        final short id = this.readShort();
+
+        if (id >= 0) {
+            final byte amount = this.readByte();
+            final short data = this.readShort();
+            var1 = new ItemStack(id, amount, data, this.readNBTTagCompoundFromBuffer());
+        }
+
+        return var1;
     }
 
     public Position readPosition() {
@@ -132,7 +115,7 @@ public class PacketBuffer extends ByteBuf
     }
 
     public void writePosition(final Position location) {
-        this.writeLong(((long)location.getX() & 0x3FFFFFF) << 38 | ((long)location.getY() & 0xFFF) << 26 | (long)location.getZ() & 0x3FFFFFF);
+        this.writeLong(((long) location.getX() & 0x3FFFFFF) << 38 | ((long) location.getY() & 0xFFF) << 26 | (long) location.getZ() & 0x3FFFFFF);
     }
 
     public PacketBuffer writeByteArray(byte[] array) {
@@ -170,8 +153,7 @@ public class PacketBuffer extends ByteBuf
         return this;
     }
 
-    public int[] readVarIntArray()
-    {
+    public int[] readVarIntArray() {
         return this.readVarIntArray(this.readableBytes());
     }
 
@@ -203,13 +185,11 @@ public class PacketBuffer extends ByteBuf
         return this;
     }
 
-    public long[] readLongArray(long[] array)
-    {
+    public long[] readLongArray(long[] array) {
         return this.readLongArray(array, this.readableBytes() / 8);
     }
 
-    public long[] readLongArray(long[] p_189423_1_, int p_189423_2_)
-    {
+    public long[] readLongArray(long[] p_189423_1_, int p_189423_2_) {
         int i = this.readVarIntFromBuffer();
 
         if (p_189423_1_ == null || p_189423_1_.length != i) {
@@ -228,13 +208,11 @@ public class PacketBuffer extends ByteBuf
     }
 
 
-    public <T extends Enum<T>> T readEnumValue(Class<T> enumClass)
-    {
-        return (T)((Enum[])enumClass.getEnumConstants())[this.readVarIntFromBuffer()];
+    public <T extends Enum<T>> T readEnumValue(Class<T> enumClass) {
+        return (T) ((Enum[]) enumClass.getEnumConstants())[this.readVarIntFromBuffer()];
     }
 
-    public PacketBuffer writeEnumValue(Enum<?> value)
-    {
+    public PacketBuffer writeEnumValue(Enum<?> value) {
         return this.writeVarIntToBuffer(value.ordinal());
     }
 
@@ -264,7 +242,7 @@ public class PacketBuffer extends ByteBuf
 
         while (true) {
             byte b0 = this.readByte();
-            i |= (long)(b0 & 127) << j++ * 7;
+            i |= (long) (b0 & 127) << j++ * 7;
 
             if (j > 10) {
                 throw new RuntimeException("VarLong too big");
@@ -284,8 +262,7 @@ public class PacketBuffer extends ByteBuf
         return this;
     }
 
-    public UUID readUuid()
-    {
+    public UUID readUuid() {
         return new UUID(this.readLong(), this.readLong());
     }
 

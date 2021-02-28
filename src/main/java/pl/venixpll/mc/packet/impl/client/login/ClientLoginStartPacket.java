@@ -11,11 +11,11 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @AllArgsConstructor
 public class ClientLoginStartPacket extends Packet {
 
+    private String username;
+
     {
         this.setPacketID(0x00);
     }
-
-    private String username;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

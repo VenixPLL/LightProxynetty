@@ -1,9 +1,8 @@
 package pl.venixpll.mc.data.game;
 
-import java.util.*;
+import java.util.Arrays;
 
-public enum WindowAction
-{
+public enum WindowAction {
     CLICK_ITEM(0),
     SHIFT_CLICK_ITEM(1),
     MOVE_TO_HOTBAR_SLOT(2),
@@ -18,12 +17,12 @@ public enum WindowAction
         this.id = id;
     }
 
-    public int getId() {
-        return this.id;
-    }
-
     public static WindowAction getActionById(final int id) {
         return Arrays.stream(values()).filter(a -> a.getId() == id).findFirst().orElse(null);
+    }
+
+    public int getId() {
+        return this.id;
     }
 }
 

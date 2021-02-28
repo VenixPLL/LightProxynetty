@@ -1,7 +1,6 @@
 package pl.venixpll.utils;
 
-public abstract class LazyLoadBase<T>
-{
+public abstract class LazyLoadBase<T> {
     private T value;
     private boolean loaded;
 

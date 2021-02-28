@@ -68,7 +68,7 @@ public class MessageStyle implements Cloneable {
     }
 
     protected MessageStyle setParent(MessageStyle parent) {
-        if(parent == null) {
+        if (parent == null) {
             parent = DEFAULT;
         }
 
@@ -98,8 +98,8 @@ public class MessageStyle implements Cloneable {
 
     @Override
     public boolean equals(Object o) {
-        if(this == o) return true;
-        if(!(o instanceof MessageStyle)) return false;
+        if (this == o) return true;
+        if (!(o instanceof MessageStyle)) return false;
 
         MessageStyle that = (MessageStyle) o;
         return this.color == that.color &&

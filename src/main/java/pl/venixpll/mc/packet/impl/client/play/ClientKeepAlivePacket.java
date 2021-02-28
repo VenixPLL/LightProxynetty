@@ -11,11 +11,11 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @NoArgsConstructor
 public class ClientKeepAlivePacket extends Packet {
 
+    private int time;
+
     {
         this.setPacketID(0x00);
     }
-
-    private int time;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

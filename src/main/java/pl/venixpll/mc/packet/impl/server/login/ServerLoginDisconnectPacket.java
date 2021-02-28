@@ -12,11 +12,11 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @Data
 public class ServerLoginDisconnectPacket extends Packet {
 
+    private Message reason;
+
     {
         this.setPacketID(0x00);
     }
-
-    private Message reason;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

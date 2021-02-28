@@ -3,8 +3,7 @@ package pl.venixpll.mc.data.status;
 import lombok.Data;
 
 @Data
-public class VersionInfo
-{
+public class VersionInfo {
     private String name;
     private int protocol;
 

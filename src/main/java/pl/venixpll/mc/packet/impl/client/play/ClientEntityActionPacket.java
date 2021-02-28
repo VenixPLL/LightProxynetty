@@ -11,11 +11,11 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @Data
 public class ClientEntityActionPacket extends Packet {
 
+    private int entityId, actionId, actionParameter;
+
     {
         this.setPacketID(0x0B);
     }
-
-    private int entityId,actionId,actionParameter;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

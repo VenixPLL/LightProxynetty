@@ -16,7 +16,7 @@ public enum Dimension {
         this.id = id;
     }
 
-    public static Dimension getById(int id){
+    public static Dimension getById(int id) {
         return Arrays.asList(Dimension.values()).stream().filter(gm -> gm.id == id).findFirst().orElse(Dimension.OVERWORLD);
     }
 }

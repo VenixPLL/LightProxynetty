@@ -11,11 +11,11 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @NoArgsConstructor
 public class ServerLoginSetCompressionPacket extends Packet {
 
+    private int threshold;
+
     {
         this.setPacketID(0x03);
     }
-
-    private int threshold;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

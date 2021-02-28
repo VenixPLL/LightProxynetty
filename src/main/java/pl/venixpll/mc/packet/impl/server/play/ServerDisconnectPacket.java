@@ -1,6 +1,5 @@
 package pl.venixpll.mc.packet.impl.server.play;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.venixpll.mc.data.chat.Message;
@@ -12,13 +11,13 @@ import pl.venixpll.utils.LogUtil;
 @NoArgsConstructor
 public class ServerDisconnectPacket extends Packet {
 
+    private Message reason;
+
     {
         this.setPacketID(0x40);
     }
 
-    private Message reason;
-
-    public ServerDisconnectPacket(String reason){
+    public ServerDisconnectPacket(String reason) {
         this.reason = Message.fromString(LogUtil.fixColor(reason));
     }
 

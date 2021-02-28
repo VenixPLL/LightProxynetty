@@ -14,19 +14,19 @@ public class ProxyChecker {
     public final ArrayList<Proxy> MIDRANGE_PROXIES = new ArrayList<>();
     public final ArrayList<Proxy> WORST_PROXIES = new ArrayList<>();
 
-    public ProxyChecker checkArray(final List<Proxy> proxies){
+    public ProxyChecker checkArray(final List<Proxy> proxies) {
         WORST_PROXIES.clear();
         MIDRANGE_PROXIES.clear();
         WORST_PROXIES.clear();
         final AtomicInteger index = new AtomicInteger(0);
-        IntStream.range(0,10).forEachOrdered(i -> {
+        IntStream.range(0, 10).forEachOrdered(i -> {
             final ExecutorService checkService = Executors.newSingleThreadExecutor();
             checkService.submit(() -> {
-                while(true){
-                    if(index.get() == proxies.size() || index.get() > proxies.size()){
+                while (true) {
+                    if (index.get() == proxies.size() || index.get() > proxies.size()) {
                         checkService.shutdownNow();
                         break;
-                    }else {
+                    } else {
                         final Proxy checking = proxies.get(index.getAndAdd(1));
                         final int pCheck = NetUtils.checkProxy(checking, 500);
                         if (pCheck != -1) {

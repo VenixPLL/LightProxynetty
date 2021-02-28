@@ -6,14 +6,14 @@ import pl.venixpll.system.command.Command;
 public class CommandTps extends Command {
 
     public CommandTps() {
-        super(",tps","Checking tick rate of current server!","");
+        super(",tps", "Checking tick rate of current server!", "");
     }
 
     @Override
     public void onExecute(String cmd, Player sender) throws Exception {
-        if(sender.getConnector() != null && sender.getConnector().isConnected()){
+        if (sender.getConnector() != null && sender.getConnector().isConnected()) {
             sender.sendChatMessage("&6TPS&8: &c" + sender.getConnector().getLastTps());
-        }else{
+        } else {
             sender.sendChatMessage("&cYou have to be connected!");
         }
     }

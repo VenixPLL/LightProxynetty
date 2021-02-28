@@ -1,6 +1,5 @@
 package pl.venixpll.mc.netty;
 
-import com.google.common.primitives.Bytes;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
@@ -26,10 +25,10 @@ public class NettyPacketCodec extends ByteToMessageCodec<Packet> {
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Packet packet, ByteBuf byteBuf) throws Exception {
         final PacketBuffer packetbuffer = new PacketBuffer(byteBuf);
-        if(packet.isCustom()){
+        if (packet.isCustom()) {
             packetbuffer.writeVarIntToBuffer(packet.getPacketID());
             packetbuffer.writeBytes(packet.getCustomData());
-        }else {
+        } else {
             packetbuffer.writeVarIntToBuffer(packet.getPacketID());
             packet.write(packetbuffer);
         }
@@ -44,19 +43,19 @@ public class NettyPacketCodec extends ByteToMessageCodec<Packet> {
 
             final int packetId = packetBuffer.readVarIntFromBuffer();
 
-            Packet packet = PacketRegistry.getPacket(connectionState,packetDirection,packetId);
+            Packet packet = PacketRegistry.getPacket(connectionState, packetDirection, packetId);
 
             if (packet == null) {
                 packet = new CustomPacket();
                 final byte[] data = new byte[packetBuffer.readableBytes()];
                 packetBuffer.readBytes(data);
-                packet.setCustom(packetId,data);
-            }else {
+                packet.setCustom(packetId, data);
+            } else {
                 packet.read(packetBuffer);
             }
 
             if (packetBuffer.isReadable()) {
-                throw new DecoderException(String.format("Packet (%s) was larger than i expected found %s bytes extra",packet.getClass().getSimpleName(),packetBuffer.readableBytes()));
+                throw new DecoderException(String.format("Packet (%s) was larger than i expected found %s bytes extra", packet.getClass().getSimpleName(), packetBuffer.readableBytes()));
             }
             list.add(packet);
             byteBuf.clear();

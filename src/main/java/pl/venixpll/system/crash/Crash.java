@@ -12,6 +12,7 @@ public abstract class Crash {
     private CrashType crashType;
 
     public abstract void init();
-    public abstract void execute(final String message,final Player sender);
+
+    public abstract void execute(final String message, final Player sender);
 
 }

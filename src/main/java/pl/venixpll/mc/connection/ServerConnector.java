@@ -17,7 +17,6 @@ import pl.venixpll.mc.netty.NettyPacketCodec;
 import pl.venixpll.mc.netty.NettyVarInt21FrameCodec;
 import pl.venixpll.mc.objects.Player;
 import pl.venixpll.mc.packet.Packet;
-import pl.venixpll.mc.packet.impl.CustomPacket;
 import pl.venixpll.mc.packet.impl.client.login.ClientLoginStartPacket;
 import pl.venixpll.mc.packet.impl.client.play.ClientKeepAlivePacket;
 import pl.venixpll.mc.packet.impl.handshake.HandshakePacket;
@@ -43,51 +42,47 @@ public class ServerConnector implements IConnector {
 
     private final Player owner;
     private final String username;
-
-    private Channel channel;
-    private EnumConnectionState connectionState = EnumConnectionState.LOGIN;
-    private boolean connected;
-
     private final ArrayList<Long> tpstimes = new ArrayList<>();
-    private double lastTps;
     private final WaitTimer tpsTimer = new WaitTimer();
-
-    private long lastPacketTime = 0L;
-
     private final LazyLoadBase<NioEventLoopGroup> CLIENT_NIO_EVENT_LOOP_PING = new LazyLoadBase<NioEventLoopGroup>() {
         @Override
         protected NioEventLoopGroup load() {
             return new NioEventLoopGroup(0, new ThreadFactoryBuilder().setNameFormat("Netty Client IO #%d").setDaemon(true).build());
         }
     };
+    private Channel channel;
+    private EnumConnectionState connectionState = EnumConnectionState.LOGIN;
+    private boolean connected;
+    private double lastTps;
+    private long lastPacketTime = 0L;
 
     @Override
     public void connect(String host, int port, Proxy proxy) {
-        final Bootstrap bootstrap  = new Bootstrap()
+        final Bootstrap bootstrap = new Bootstrap()
                 .group(CLIENT_NIO_EVENT_LOOP_PING.getValue())
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
                         final ChannelPipeline pipeline = socketChannel.pipeline();
-                        if(proxy != Proxy.NO_PROXY) {
+                        if (proxy != Proxy.NO_PROXY) {
                             pipeline.addFirst(new Socks4ProxyHandler(proxy.address()));
                         }
-                        pipeline.addLast("timer",new ReadTimeoutHandler(20));
-                        pipeline.addLast("frameCodec",new NettyVarInt21FrameCodec());
-                        pipeline.addLast("packetCodec",new NettyPacketCodec(EnumConnectionState.LOGIN, EnumPacketDirection.CLIENTBOUND));
+                        pipeline.addLast("timer", new ReadTimeoutHandler(20));
+                        pipeline.addLast("frameCodec", new NettyVarInt21FrameCodec());
+                        pipeline.addLast("packetCodec", new NettyPacketCodec(EnumConnectionState.LOGIN, EnumPacketDirection.CLIENTBOUND));
                         pipeline.addLast("handler", new SimpleChannelInboundHandler<Packet>() {
                             @Override
                             public void channelActive(ChannelHandlerContext ctx) throws Exception {
                                 owner.sendChatMessage("&aConnecting...");
                                 TimeUnit.MILLISECONDS.sleep(150);
-                                sendPacket(new HandshakePacket(47,host,port,2));
+                                sendPacket(new HandshakePacket(47, host, port, 2));
                                 sendPacket(new ClientLoginStartPacket(username));
                             }
 
                             @Override
                             public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-                                if(connected){
+                                if (connected) {
                                     owner.sendChatMessage("&cServer disconnected directly!");
                                 }
                                 connected = false;
@@ -97,31 +92,31 @@ public class ServerConnector implements IConnector {
                             protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
                                 owner.setLastPacket(packet.getClass().getSimpleName());
                                 owner.setPacketID(packet.getPacketID());
-                                if(packet instanceof ServerLoginSetCompressionPacket) {
+                                if (packet instanceof ServerLoginSetCompressionPacket) {
                                     setCompressionThreshold(((ServerLoginSetCompressionPacket) packet).getThreshold());
-                                }else if(packet instanceof ServerLoginEncryptionRequestPacket){
+                                } else if (packet instanceof ServerLoginEncryptionRequestPacket) {
                                     owner.sendChatMessage("&cProxy does not support Minecraft Premium!");
                                     close();
-                                }else if(packet instanceof ServerLoginSuccessPacket){
+                                } else if (packet instanceof ServerLoginSuccessPacket) {
                                     setConnectionState(EnumConnectionState.PLAY);
                                     owner.sendChatMessage("&aLogged in!");
-                                }else if(packet instanceof ServerJoinGamePacket) {
+                                } else if (packet instanceof ServerJoinGamePacket) {
                                     WorldUtils.dimSwitch(owner, (ServerJoinGamePacket) packet);
                                     connected = true;
                                     owner.sendChatMessage("&aConnected!");
-                                }else if(packet instanceof ServerDisconnectPacket) {
+                                } else if (packet instanceof ServerDisconnectPacket) {
                                     connected = false;
                                     WorldUtils.emptyWorld(owner);
                                     owner.sendChatMessage("&cDisconnected!");
                                     owner.sendChatMessage("&f" + ((ServerDisconnectPacket) packet).getReason().getFullText());
-                                }else if(packet instanceof ServerLoginDisconnectPacket){
+                                } else if (packet instanceof ServerLoginDisconnectPacket) {
                                     connected = false;
                                     owner.sendChatMessage("&cDisconnected during login!");
                                     owner.sendChatMessage("&f" + ((ServerLoginDisconnectPacket) packet).getReason().getFullText());
-                                }else if(packet instanceof ServerKeepAlivePacket){
+                                } else if (packet instanceof ServerKeepAlivePacket) {
                                     sendPacket(new ClientKeepAlivePacket(((ServerKeepAlivePacket) packet).getKeepaliveId()));
-                                }else if(connected && connectionState == EnumConnectionState.PLAY){
-                                    if(packet instanceof ServerTimeUpdatePacket) {
+                                } else if (connected && connectionState == EnumConnectionState.PLAY) {
+                                    if (packet instanceof ServerTimeUpdatePacket) {
                                         tpstimes.add(Math.max(1000, tpsTimer.getTime()));
                                         long timesAdded = 0;
                                         if (tpstimes.size() > 5) {
@@ -146,29 +141,29 @@ public class ServerConnector implements IConnector {
         this.channel.config().setOption(ChannelOption.IP_TOS, 0x18);
     }
 
-    public void setConnectionState(final EnumConnectionState state){
-        ((NettyPacketCodec)channel.pipeline().get("packetCodec")).setConnectionState(state);
+    public void setConnectionState(final EnumConnectionState state) {
+        ((NettyPacketCodec) channel.pipeline().get("packetCodec")).setConnectionState(state);
         connectionState = state;
     }
 
-    public void setCompressionThreshold(final int threshold){
-        if(connectionState == EnumConnectionState.LOGIN) {
+    public void setCompressionThreshold(final int threshold) {
+        if (connectionState == EnumConnectionState.LOGIN) {
             if (channel.pipeline().get("compression") == null) {
                 channel.pipeline().addBefore("packetCodec", "compression", new NettyCompressionCodec(threshold));
             } else {
                 ((NettyCompressionCodec) channel.pipeline().get("compression")).setCompressionThreshold(threshold);
             }
-        }else{
+        } else {
             throw new UnsupportedOperationException();
         }
     }
 
-    public void close(){
+    public void close() {
         connected = false;
         this.channel.close();
     }
 
-    public void sendPacket(final Packet packet){
+    public void sendPacket(final Packet packet) {
         this.channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
     }
 }

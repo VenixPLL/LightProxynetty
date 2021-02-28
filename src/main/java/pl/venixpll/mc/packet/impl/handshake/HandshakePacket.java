@@ -13,14 +13,14 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @ToString
 public class HandshakePacket extends Packet {
 
-    {
-        this.setPacketID(0x00);
-    }
-
     private int protocolId;
     private String host;
     private int port;
     private int nextState;
+
+    {
+        this.setPacketID(0x00);
+    }
 
     @Override
     public void write(PacketBuffer out) throws Exception {

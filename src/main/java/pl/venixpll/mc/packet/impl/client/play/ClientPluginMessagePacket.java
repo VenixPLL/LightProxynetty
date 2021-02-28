@@ -11,12 +11,12 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @AllArgsConstructor
 public class ClientPluginMessagePacket extends Packet {
 
+    private String channel;
+    private byte[] data;
+
     {
         this.setPacketID(0x17);
     }
-
-    private String channel;
-    private byte[] data;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

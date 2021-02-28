@@ -7,7 +7,6 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -21,32 +20,32 @@ import pl.venixpll.mc.netty.NettyVarInt21FrameCodec;
 import pl.venixpll.mc.objects.Player;
 import pl.venixpll.mc.packet.Packet;
 import pl.venixpll.mc.packet.impl.server.play.ServerKeepAlivePacket;
-import pl.venixpll.mc.packet.registry.PacketRegistry;
 import pl.venixpll.utils.LazyLoadBase;
 import pl.venixpll.utils.LogUtil;
 import pl.venixpll.utils.WaitTimer;
 
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Data
 public class MinecraftServer {
 
+    public final List<Player> playerList = new CopyOnWriteArrayList<>();
     private final int port;
-
     private final LazyLoadBase<NioEventLoopGroup> NETTY_CLIENT_IO = new LazyLoadBase<NioEventLoopGroup>() {
         @Override
         protected NioEventLoopGroup load() {
             return new NioEventLoopGroup(0, new ThreadFactoryBuilder().setNameFormat("Netty Client IO #%d").setDaemon(true).build());
         }
     };
-
-    public final List<Player> playerList = new CopyOnWriteArrayList<>();
     public ServerStatusInfo statusInfo;
 
-    public MinecraftServer bind(final String successMessage){
+    public MinecraftServer bind(final String successMessage) {
         final ChannelFuture future = new ServerBootstrap()
                 .group(NETTY_CLIENT_IO.getValue())
                 .channel(NioServerSocketChannel.class)
@@ -57,9 +56,9 @@ public class MinecraftServer {
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
                         final ChannelPipeline pipeline = socketChannel.pipeline();
 
-                        pipeline.addLast("timer",new ReadTimeoutHandler(10));
-                        pipeline.addLast("varintCodec",new NettyVarInt21FrameCodec());
-                        pipeline.addLast("packetCodec",new NettyPacketCodec(EnumConnectionState.HANDSHAKE, EnumPacketDirection.SERVERBOUND));
+                        pipeline.addLast("timer", new ReadTimeoutHandler(10));
+                        pipeline.addLast("varintCodec", new NettyVarInt21FrameCodec());
+                        pipeline.addLast("packetCodec", new NettyPacketCodec(EnumConnectionState.HANDSHAKE, EnumPacketDirection.SERVERBOUND));
 
                         Player player = new Player();
 
@@ -87,7 +86,7 @@ public class MinecraftServer {
                             }
                         });
                     }
-                }).bind(port).addListener((ChannelFutureListener) channelFuture -> LogUtil.printMessage(successMessage,port));
+                }).bind(port).addListener((ChannelFutureListener) channelFuture -> LogUtil.printMessage(successMessage, port));
         final ScheduledExecutorService keepAliveTask = Executors.newSingleThreadScheduledExecutor();
 
         final WaitTimer keepAliveTimer = new WaitTimer();
@@ -95,13 +94,13 @@ public class MinecraftServer {
         keepAliveTask.scheduleAtFixedRate(() -> {
             if (keepAliveTimer.hasTimeElapsed(3000, true)) {
                 this.playerList.stream().filter(p -> p.getConnectionState() == EnumConnectionState.PLAY).collect(Collectors.toList()).forEach(p -> {
-                    p.sendPacket(new ServerKeepAlivePacket((int)System.currentTimeMillis()));
+                    p.sendPacket(new ServerKeepAlivePacket((int) System.currentTimeMillis()));
                 });
             }
             this.playerList.stream().filter(p -> p.getConnectionState() == EnumConnectionState.PLAY).collect(Collectors.toList()).forEach(p -> {
                 p.tick();
             });
-        },50,50, TimeUnit.MILLISECONDS);
+        }, 50, 50, TimeUnit.MILLISECONDS);
         return this;
     }
 

@@ -13,16 +13,16 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @Data
 public class ClientPlayerWindowActionPacket extends Packet {
 
-    {
-        this.setPacketID(0x0E);
-    }
-
     private int windowId;
     private short slot;
     private int button;
     private WindowAction mode;
     private int action;
     private ItemStack item;
+
+    {
+        this.setPacketID(0x0E);
+    }
 
     @Override
     public void write(PacketBuffer packetBuffer) throws Exception {

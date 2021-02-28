@@ -22,19 +22,20 @@ public class NetHandlerLoginServer implements INetHandler {
 
     @Override
     public void disconnected() {
-        LogUtil.printMessage("[%s] Disconnected during login sequence!",player.getUsername());
+        LogUtil.printMessage("[%s] Disconnected during login sequence!", player.getUsername());
     }
 
     @Override
     public void handlePacket(Packet packet) {
-        if(packet instanceof ClientLoginStartPacket){
+        if (packet instanceof ClientLoginStartPacket) {
             player.setUsername(((ClientLoginStartPacket) packet).getUsername());
             player.setCompressionThreshold(256);
-            player.sendPacket(new ServerLoginSuccessPacket(UUID.randomUUID(),player.getUsername()));
-            LogUtil.printMessage("[%s] Logged in!",player.getUsername());
+            player.sendPacket(new ServerLoginSuccessPacket(UUID.randomUUID(), player.getUsername()));
+            LogUtil.printMessage("[%s] Logged in!", player.getUsername());
             player.setConnectionState(EnumConnectionState.PLAY);
             player.setPacketHandler(new NetHandlerPlayServer(player));
             WorldUtils.emptyWorld(player);
+            WorldUtils.lobby(player, "Lobby.dat");
             LightProxy.getServer().playerList.add(player);
         }
     }

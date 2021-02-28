@@ -29,7 +29,7 @@ public class KeybindMessage extends Message {
     @Override
     public JsonElement toJson() {
         JsonElement e = super.toJson();
-        if(e.isJsonObject()) {
+        if (e.isJsonObject()) {
             JsonObject json = e.getAsJsonObject();
             json.addProperty("keybind", this.keybind);
             return json;
@@ -40,8 +40,8 @@ public class KeybindMessage extends Message {
 
     @Override
     public boolean equals(Object o) {
-        if(this == o) return true;
-        if(!(o instanceof KeybindMessage)) return false;
+        if (this == o) return true;
+        if (!(o instanceof KeybindMessage)) return false;
 
         KeybindMessage that = (KeybindMessage) o;
         return super.equals(o) &&

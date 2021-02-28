@@ -41,47 +41,47 @@ public class Player {
 
     private List<Bot> bots = new ArrayList<>();
 
-    public void resetTitle(){
+    public void resetTitle() {
         sendPacket(new ServerTitlePacket(TitleAction.RESET));
     }
 
-    public void sendTitle(final String header,final String footer){
-        this.sendTitle(header,footer,10,10,10);
+    public void sendTitle(final String header, final String footer) {
+        this.sendTitle(header, footer, 10, 10, 10);
     }
 
-    public void sendTitle(final String header,final String footer,final int fadeIn,final int stay,final int fadeOut){
-        if(header != null) sendPacket(new ServerTitlePacket(TitleAction.TITLE,header));
-        if(footer != null) sendPacket(new ServerTitlePacket(TitleAction.SUBTITLE,footer));
-        sendPacket(new ServerTitlePacket(TitleAction.TIMES,fadeIn,stay,fadeOut));
+    public void sendTitle(final String header, final String footer, final int fadeIn, final int stay, final int fadeOut) {
+        if (header != null) sendPacket(new ServerTitlePacket(TitleAction.TITLE, header));
+        if (footer != null) sendPacket(new ServerTitlePacket(TitleAction.SUBTITLE, footer));
+        sendPacket(new ServerTitlePacket(TitleAction.TIMES, fadeIn, stay, fadeOut));
     }
 
-    public void sendHotbar(final String message, final Object... obj){
-        sendPacket(new ServerChatPacket(String.format(message,obj), MessagePosition.HOTBAR));
+    public void sendHotbar(final String message, final Object... obj) {
+        sendPacket(new ServerChatPacket(String.format(message, obj), MessagePosition.HOTBAR));
     }
 
-    public final void tick(){
-        if(this.getConnector() != null && this.getConnector().isConnected()){
+    public final void tick() {
+        if (this.getConnector() != null && this.getConnector().isConnected()) {
             final int packetTime = (int) (System.currentTimeMillis() - this.getConnector().getLastPacketTime());
-            if(packetTime > 2000){
-                sendTitle("&cServer is not responding!",String.format("&6%sms",packetTime),0,10,0);
-            }else if(debugInfo){
-                sendHotbar("&aLast packet received&8: &6%s &7(&cID: &e%s&7)",lastPacket,packetID);
+            if (packetTime > 2000) {
+                sendTitle("&cServer is not responding!", String.format("&6%sms", packetTime), 0, 10, 0);
+            } else if (debugInfo) {
+                sendHotbar("&aLast packet received&8: &6%s &7(&cID: &e%s&7)", lastPacket, packetID);
             }
         }
     }
 
-    public void sendChatMessage(final String message,final Object... args){
-        sendPacket(new ServerChatPacket("&fLight&6Proxy &8» &6" + String.format(message,args)));
+    public void sendChatMessage(final String message, final Object... args) {
+        sendPacket(new ServerChatPacket("&fLight&6Proxy &8» &6" + String.format(message, args)));
     }
 
     public void sendChatMessageNoPrefix(final String message, final Object... args) {
-        sendPacket(new ServerChatPacket(String.format(message,args)));
+        sendPacket(new ServerChatPacket(String.format(message, args)));
     }
 
-    public void packetReceived(final Packet packet){
-        final PacketReceivedEvent event = new PacketReceivedEvent(packet,this);
+    public void packetReceived(final Packet packet) {
+        final PacketReceivedEvent event = new PacketReceivedEvent(packet, this);
         EventManager.call(event);
-        if(!event.isCancelled()) {
+        if (!event.isCancelled()) {
             if (packet instanceof HandshakePacket) {
                 final HandshakePacket handshake = (HandshakePacket) packet;
                 switch (handshake.getNextState()) {
@@ -104,37 +104,36 @@ public class Player {
         }
     }
 
-    public void disconnected(){
-        if(this.getConnector() != null && this.getConnector().isConnected()){
+    public void disconnected() {
+        if (this.getConnector() != null && this.getConnector().isConnected()) {
             this.getConnector().close();
         }
         LightProxy.getServer().playerList.remove(this);
-        if(packetHandler != null)
+        if (packetHandler != null)
             packetHandler.disconnected();
     }
 
-    public void setConnectionState(final EnumConnectionState state){
-        ((NettyPacketCodec)channel.pipeline().get("packetCodec")).setConnectionState(state);
+    public void setConnectionState(final EnumConnectionState state) {
+        ((NettyPacketCodec) channel.pipeline().get("packetCodec")).setConnectionState(state);
         connectionState = state;
     }
 
-    public void setCompressionThreshold(final int threshold){
-        if(connectionState == EnumConnectionState.LOGIN) {
+    public void setCompressionThreshold(final int threshold) {
+        if (connectionState == EnumConnectionState.LOGIN) {
             sendPacket(new ServerLoginSetCompressionPacket(threshold));
             if (channel.pipeline().get("compression") == null) {
                 channel.pipeline().addBefore("packetCodec", "compression", new NettyCompressionCodec(threshold));
             } else {
                 ((NettyCompressionCodec) channel.pipeline().get("compression")).setCompressionThreshold(threshold);
             }
-        }else{
+        } else {
             throw new UnsupportedOperationException();
         }
     }
 
-    public void sendPacket(final Packet packet){
+    public void sendPacket(final Packet packet) {
         this.channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
     }
-
 
 
 }

@@ -4,8 +4,7 @@ import lombok.Data;
 import pl.venixpll.mc.data.chat.Message;
 
 @Data
-public class ServerStatusInfo
-{
+public class ServerStatusInfo {
     private VersionInfo version;
     private PlayerInfo players;
     private Message description;

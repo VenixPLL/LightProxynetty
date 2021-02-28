@@ -16,39 +16,39 @@ public abstract class Message implements Cloneable {
     public static Message fromString(String str) {
         try {
             return fromJson(new JsonParser().parse(str));
-        } catch(Exception e) {
+        } catch (Exception e) {
             return new TextMessage(str);
         }
     }
 
     public static Message fromJson(JsonElement e) {
-        if(e.isJsonPrimitive()) {
+        if (e.isJsonPrimitive()) {
             return new TextMessage(e.getAsString());
-        } else if(e.isJsonArray()) {
+        } else if (e.isJsonArray()) {
             JsonArray array = e.getAsJsonArray();
-            if(array.size() == 0) {
+            if (array.size() == 0) {
                 return new TextMessage("");
             }
 
             Message msg = Message.fromJson(array.get(0));
-            for(int index = 1; index < array.size(); index++) {
+            for (int index = 1; index < array.size(); index++) {
                 msg.addExtra(Message.fromJson(array.get(index)));
             }
 
             return msg;
-        } else if(e.isJsonObject()) {
+        } else if (e.isJsonObject()) {
             JsonObject json = e.getAsJsonObject();
             Message msg = null;
-            if(json.has("text")) {
+            if (json.has("text")) {
                 msg = new TextMessage(json.get("text").getAsString());
-            } else if(json.has("translate")) {
+            } else if (json.has("translate")) {
                 Message with[] = new Message[0];
-                if(json.has("with")) {
+                if (json.has("with")) {
                     JsonArray withJson = json.get("with").getAsJsonArray();
                     with = new Message[withJson.size()];
-                    for(int index = 0; index < withJson.size(); index++) {
+                    for (int index = 0; index < withJson.size(); index++) {
                         JsonElement el = withJson.get(index);
-                        if(el.isJsonPrimitive()) {
+                        if (el.isJsonPrimitive()) {
                             with[index] = new TextMessage(el.getAsString());
                         } else {
                             with[index] = Message.fromJson(el.getAsJsonObject());
@@ -57,42 +57,42 @@ public abstract class Message implements Cloneable {
                 }
 
                 msg = new TranslationMessage(json.get("translate").getAsString(), with);
-            } else if(json.has("keybind")) {
+            } else if (json.has("keybind")) {
                 msg = new KeybindMessage(json.get("keybind").getAsString());
             } else {
                 throw new IllegalArgumentException("Unknown message type in json: " + json.toString());
             }
 
             MessageStyle style = new MessageStyle();
-            if(json.has("color")) {
+            if (json.has("color")) {
                 style.setColor(ChatColor.byName(json.get("color").getAsString()));
             }
 
-            for(ChatFormat format : ChatFormat.values()) {
-                if(json.has(format.toString()) && json.get(format.toString()).getAsBoolean()) {
+            for (ChatFormat format : ChatFormat.values()) {
+                if (json.has(format.toString()) && json.get(format.toString()).getAsBoolean()) {
                     style.addFormat(format);
                 }
             }
 
-            if(json.has("clickEvent")) {
+            if (json.has("clickEvent")) {
                 JsonObject click = json.get("clickEvent").getAsJsonObject();
                 style.setClickEvent(new ClickEvent(ClickAction.byName(click.get("action").getAsString()), click.get("value").getAsString()));
             }
 
-            if(json.has("hoverEvent")) {
+            if (json.has("hoverEvent")) {
                 JsonObject hover = json.get("hoverEvent").getAsJsonObject();
                 style.setHoverEvent(new HoverEvent(HoverAction.byName(hover.get("action").getAsString()), Message.fromJson(hover.get("value"))));
             }
 
-            if(json.has("insertion")) {
+            if (json.has("insertion")) {
                 style.setInsertion(json.get("insertion").getAsString());
             }
 
             msg.setStyle(style);
 
-            if(json.has("extra")) {
+            if (json.has("extra")) {
                 JsonArray extraJson = json.get("extra").getAsJsonArray();
-                for(int index = 0; index < extraJson.size(); index++) {
+                for (int index = 0; index < extraJson.size(); index++) {
                     msg.addExtra(Message.fromJson(extraJson.get(index)));
                 }
             }
@@ -107,7 +107,7 @@ public abstract class Message implements Cloneable {
 
     public String getFullText() {
         StringBuilder build = new StringBuilder(this.getText());
-        for(Message msg : this.extra) {
+        for (Message msg : this.extra) {
             build.append(msg.getFullText());
         }
 
@@ -129,7 +129,7 @@ public abstract class Message implements Cloneable {
 
     public Message setExtra(List<Message> extra) {
         this.extra = new ArrayList<Message>(extra);
-        for(Message msg : this.extra) {
+        for (Message msg : this.extra) {
             msg.getStyle().setParent(this.style);
         }
 
@@ -149,7 +149,7 @@ public abstract class Message implements Cloneable {
     }
 
     public Message clearExtra() {
-        for(Message msg : this.extra) {
+        for (Message msg : this.extra) {
             msg.getStyle().setParent(null);
         }
 
@@ -162,8 +162,8 @@ public abstract class Message implements Cloneable {
 
     @Override
     public boolean equals(Object o) {
-        if(this == o) return true;
-        if(!(o instanceof Message)) return false;
+        if (this == o) return true;
+        if (!(o instanceof Message)) return false;
 
         Message that = (Message) o;
         return Objects.equals(this.style, that.style) &&
@@ -183,31 +183,31 @@ public abstract class Message implements Cloneable {
     public JsonElement toJson() {
         JsonObject json = new JsonObject();
         json.addProperty("color", this.style.getColor().toString());
-        for(ChatFormat format : this.style.getFormats()) {
+        for (ChatFormat format : this.style.getFormats()) {
             json.addProperty(format.toString(), true);
         }
 
-        if(this.style.getClickEvent() != null) {
+        if (this.style.getClickEvent() != null) {
             JsonObject click = new JsonObject();
             click.addProperty("action", this.style.getClickEvent().getAction().toString());
             click.addProperty("value", this.style.getClickEvent().getValue());
             json.add("clickEvent", click);
         }
 
-        if(this.style.getHoverEvent() != null) {
+        if (this.style.getHoverEvent() != null) {
             JsonObject hover = new JsonObject();
             hover.addProperty("action", this.style.getHoverEvent().getAction().toString());
             hover.add("value", this.style.getHoverEvent().getValue().toJson());
             json.add("hoverEvent", hover);
         }
 
-        if(this.style.getInsertion() != null) {
+        if (this.style.getInsertion() != null) {
             json.addProperty("insertion", this.style.getInsertion());
         }
 
-        if(this.extra.size() > 0) {
+        if (this.extra.size() > 0) {
             JsonArray extra = new JsonArray();
-            for(Message msg : this.extra) {
+            for (Message msg : this.extra) {
                 extra.add(msg.toJson());
             }
 

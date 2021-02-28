@@ -12,11 +12,11 @@ public class ProxyAPI {
     public static final String API_URL_FULL = "https://www.proxy-list.download/api/v1/get?type=%s&country=%s";
     public static final String API_URL = "https://www.proxy-list.download/api/v1/get?type=%s";
 
-    public static URL getURL(String type, String country) throws Exception{
-        if(country != null){
-            return new URL(String.format(API_URL_FULL,type,country));
-        }else{
-            return new URL(String.format(API_URL,type));
+    public static URL getURL(String type, String country) throws Exception {
+        if (country != null) {
+            return new URL(String.format(API_URL_FULL, type, country));
+        } else {
+            return new URL(String.format(API_URL, type));
         }
     }
 

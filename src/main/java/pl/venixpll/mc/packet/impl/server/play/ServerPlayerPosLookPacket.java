@@ -29,7 +29,7 @@ public class ServerPlayerPosLookPacket extends Packet {
         out.writeDouble(this.pos.getZ());
         out.writeFloat(this.yaw);
         out.writeFloat(this.pitch);
-        out.writeByte((byte)(this.onGround ? 1 : 0));
+        out.writeByte((byte) (this.onGround ? 1 : 0));
     }
 
     @Override
@@ -37,7 +37,7 @@ public class ServerPlayerPosLookPacket extends Packet {
         final double x = in.readDouble();
         final double y = in.readDouble();
         final double z = in.readDouble();
-        this.pos = new Position(x,y,z);
+        this.pos = new Position(x, y, z);
         this.yaw = in.readFloat();
         this.pitch = in.readFloat();
         this.onGround = in.readByte() == 1;

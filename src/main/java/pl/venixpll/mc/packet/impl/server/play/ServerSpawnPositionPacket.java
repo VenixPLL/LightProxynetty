@@ -12,11 +12,11 @@ import pl.venixpll.mc.packet.PacketBuffer;
 @Data
 public class ServerSpawnPositionPacket extends Packet {
 
+    private Position position;
+
     {
         this.setPacketID(0x05);
     }
-
-    private Position position;
 
     @Override
     public void write(PacketBuffer out) throws Exception {

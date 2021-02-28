@@ -10,8 +10,10 @@ public class ClientStatusRequestPacket extends Packet {
     }
 
     @Override
-    public void write(PacketBuffer out) throws Exception {}
+    public void write(PacketBuffer out) throws Exception {
+    }
 
     @Override
-    public void read(PacketBuffer in) throws Exception {}
+    public void read(PacketBuffer in) throws Exception {
+    }
 }
