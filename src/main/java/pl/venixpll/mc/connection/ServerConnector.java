@@ -132,6 +132,12 @@ public class ServerConnector implements IConnector {
                                     lastPacketTime = System.currentTimeMillis();
                                     owner.sendPacket(packet);
                                 }
+                                if (owner.isListenChunks()){
+                                    if (packet.getPacketID() == 0x26){
+                                        byte[] data = packet.getCustomData();
+                                        owner.getBytes().add(data);
+                                    }
+                                }
                             }
                         });
                     }

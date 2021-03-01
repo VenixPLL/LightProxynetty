@@ -39,6 +39,9 @@ public class Player {
 
     private boolean mother;
 
+    private boolean listenChunks;
+    private List<byte[]> bytes = new ArrayList<>();
+
     private List<Bot> bots = new ArrayList<>();
 
     public void resetTitle() {
