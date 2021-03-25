@@ -43,7 +43,7 @@ public class WorldUtils {
     }
 
     public static void dimSwitch(Player player, ServerJoinGamePacket packet) {
-        player.sendPacket(new ServerRespawnPacket(Dimension.END, Difficulty.PEACEFULL, Gamemode.ADVENTURE, "default_1_1"));
+        player.sendPacket(new ServerRespawnPacket(Dimension.END, Difficulty.PEACEFULL, Gamemode.SURVIVAL, "default_1_1"));
         player.sendPacket(packet);
         player.sendPacket(new ServerRespawnPacket(packet.getDimension(), packet.getDifficulty(), packet.getGamemode(), packet.getLevelType()));
     }

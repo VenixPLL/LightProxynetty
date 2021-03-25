@@ -50,7 +50,7 @@ public class LightProxy {
     public static ProxyChecker PLChecker;
     public static ProxyChecker GLChecker;
 
-    public static void main(String... args) throws Exception{
+    public static void main(String... args) throws Exception {
         LogUtil.setupLogging(null);
         PacketRegistry.load();
         LogUtil.printMessage("Loading plugins...");
@@ -67,9 +67,9 @@ public class LightProxy {
         GLChecker = new ProxyChecker().checkArray(GL_Proxies);
         final ExecutorService commandTask = Executors.newSingleThreadExecutor();
         commandTask.submit(new LowLevelCommandTask());
-        server = new MinecraftServer(25565).bind("Server is now running on port %s");
         CommandManager.init();
         CrashRegistry.init();
+        server = new MinecraftServer(25565).bind("Server is now running on port %s");
 
         //Reading status image;
         final File statusFile = new File("server_icon.png");

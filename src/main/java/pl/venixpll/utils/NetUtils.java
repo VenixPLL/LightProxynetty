@@ -57,7 +57,7 @@ public class NetUtils {
 
     public static String[] getServerAddress(final String p_78863_0_) {
         try {
-            final Hashtable var2 = new Hashtable();
+            final Hashtable<String, String> var2 = new Hashtable<>();
             var2.put("java.naming.factory.initial", "com.sun.jndi.dns.DnsContextFactory");
             var2.put("java.naming.provider.url", "dns:");
             var2.put("com.sun.jndi.dns.timeout.retries", "1");
@@ -66,7 +66,7 @@ public class NetUtils {
             final String[] var5 = var4.get("srv").get().toString().split(" ", 4);
             return new String[]{var5[3], var5[2]};
         } catch (final Throwable var6) {
-            return new String[]{p_78863_0_, Integer.toString(25565)};
+            return new String[]{p_78863_0_, "25565"};
         }
     }
 

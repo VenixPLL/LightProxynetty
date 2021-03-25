@@ -49,7 +49,7 @@ public class NetHandlerLoginServer implements INetHandler {
             player.setUsername(((ClientLoginStartPacket) packet).getUsername());
             player.setCompressionThreshold(256);
             player.sendPacket(new ServerLoginSuccessPacket(UUID.randomUUID(), player.getUsername()));
-            LogUtil.printMessage("[%s] Logged in!", player.getUsername());
+            LogUtil.printMessage("[%s] Connected!", player.getUsername());
             player.setConnectionState(EnumConnectionState.PLAY);
             player.setPacketHandler(new NetHandlerPlayServer(player));
             WorldUtils.emptyWorld(player);

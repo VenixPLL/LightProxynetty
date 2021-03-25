@@ -79,6 +79,8 @@ public class ServerConnector implements IConnector {
         final Bootstrap bootstrap = new Bootstrap()
                 .group(CLIENT_NIO_EVENT_LOOP_PING.getValue())
                 .channel(NioSocketChannel.class)
+                .option(ChannelOption.TCP_NODELAY, true)
+                .option(ChannelOption.IP_TOS, 0x18)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
@@ -161,8 +163,6 @@ public class ServerConnector implements IConnector {
                     }
                 });
         this.channel = bootstrap.connect(host, port).syncUninterruptibly().channel();
-        this.channel.config().setOption(ChannelOption.TCP_NODELAY, true);
-        this.channel.config().setOption(ChannelOption.IP_TOS, 0x18);
     }
 
     public void setConnectionState(final EnumConnectionState state) {

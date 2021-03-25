@@ -68,6 +68,8 @@ public class BotConnection implements IConnector {
         final Bootstrap bootstrap = new Bootstrap()
                 .group(CLIENT_NIO_EVENT_LOOP_PING.getValue())
                 .channel(NioSocketChannel.class)
+                .option(ChannelOption.TCP_NODELAY, true)
+                .option(ChannelOption.IP_TOS, 0x18)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
@@ -85,7 +87,7 @@ public class BotConnection implements IConnector {
                                 EventManager.call(event);
                                 if (!event.isCancelled()) {
                                     TimeUnit.MILLISECONDS.sleep(150);
-                                    sendPacket(new HandshakePacket(47, "", port, 2));
+                                    sendPacket(new HandshakePacket(47, host, port, 2));
                                     sendPacket(new ClientLoginStartPacket(owner.getUsername()));
                                 }
                             }
@@ -112,8 +114,6 @@ public class BotConnection implements IConnector {
                     }
                 });
         this.channel = bootstrap.connect(host, port).syncUninterruptibly().channel();
-        this.channel.config().setOption(ChannelOption.TCP_NODELAY, true);
-        this.channel.config().setOption(ChannelOption.IP_TOS, 0x18);
     }
 
     public void setConnectionState(final EnumConnectionState state) {

@@ -153,7 +153,7 @@ public class MathHelper {
      * third parameters.
      */
     public static int clamp_int(int p_76125_0_, int p_76125_1_, int p_76125_2_) {
-        return p_76125_0_ < p_76125_1_ ? p_76125_1_ : (p_76125_0_ > p_76125_2_ ? p_76125_2_ : p_76125_0_);
+        return p_76125_0_ < p_76125_1_ ? p_76125_1_ : (Math.min(p_76125_0_, p_76125_2_));
     }
 
     /**
@@ -161,11 +161,11 @@ public class MathHelper {
      * third parameters
      */
     public static float clamp_float(float p_76131_0_, float p_76131_1_, float p_76131_2_) {
-        return p_76131_0_ < p_76131_1_ ? p_76131_1_ : (p_76131_0_ > p_76131_2_ ? p_76131_2_ : p_76131_0_);
+        return p_76131_0_ < p_76131_1_ ? p_76131_1_ : (Math.min(p_76131_0_, p_76131_2_));
     }
 
     public static double clamp_double(double p_151237_0_, double p_151237_2_, double p_151237_4_) {
-        return p_151237_0_ < p_151237_2_ ? p_151237_2_ : (p_151237_0_ > p_151237_4_ ? p_151237_4_ : p_151237_0_);
+        return p_151237_0_ < p_151237_2_ ? p_151237_2_ : (Math.min(p_151237_0_, p_151237_4_));
     }
 
     public static double denormalizeClamp(double p_151238_0_, double p_151238_2_, double p_151238_4_) {
@@ -184,7 +184,7 @@ public class MathHelper {
             p_76132_2_ = -p_76132_2_;
         }
 
-        return p_76132_0_ > p_76132_2_ ? p_76132_0_ : p_76132_2_;
+        return Math.max(p_76132_0_, p_76132_2_);
     }
 
     /**
@@ -208,11 +208,7 @@ public class MathHelper {
 
     public static double average(long[] p_76127_0_) {
         long var1 = 0L;
-        long[] var3 = p_76127_0_;
-        int var4 = p_76127_0_.length;
-
-        for (int var5 = 0; var5 < var4; ++var5) {
-            long var6 = var3[var5];
+        for (long var6 : p_76127_0_) {
             var1 += var6;
         }
 
@@ -362,8 +358,8 @@ public class MathHelper {
         int var3 = (p_180188_1_ & 16711680) >> 16;
         int var4 = (p_180188_0_ & 65280) >> 8;
         int var5 = (p_180188_1_ & 65280) >> 8;
-        int var6 = (p_180188_0_ & 255) >> 0;
-        int var7 = (p_180188_1_ & 255) >> 0;
+        int var6 = (p_180188_0_ & 255);
+        int var7 = (p_180188_1_ & 255);
         int var8 = (int) ((float) var2 * (float) var3 / 255.0F);
         int var9 = (int) ((float) var4 * (float) var5 / 255.0F);
         int var10 = (int) ((float) var6 * (float) var7 / 255.0F);
