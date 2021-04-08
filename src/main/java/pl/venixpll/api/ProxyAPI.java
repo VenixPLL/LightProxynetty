@@ -27,8 +27,8 @@ import java.util.Scanner;
 
 public class ProxyAPI {
 
-    public static final String API_URL_FULL = "https://www.proxy-list.download/api/v1/get?type=%s&country=%s";
-    public static final String API_URL = "https://www.proxy-list.download/api/v1/get?type=%s";
+    public static final String API_URL_FULL = "https://api.proxyscrape.com/?request=displayproxies&proxytype=%s&timeout=300&country=%s&anonymity=elite&ssl=all";
+    public static final String API_URL = "https://api.proxyscrape.com/?request=displayproxies&proxytype=%s&timeout=300&country=all&anonymity=elite&ssl=all";
 
     public static URL getURL(String type, String country) throws Exception {
         if (country != null) {
