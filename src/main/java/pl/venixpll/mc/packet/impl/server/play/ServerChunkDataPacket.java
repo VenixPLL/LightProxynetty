@@ -45,7 +45,7 @@ public class ServerChunkDataPacket extends Packet {
 
             WritedChunkSection section = WritedChunkSection.writeChunkSection(chunkSection, isHaveSky, biome);
 
-            packetBuffer.writeShort(section.getBitmask());
+            packetBuffer.writeShort(section.getBitmask() & 65535);
             packetBuffer.writeByteArray(section.getData());
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -60,7 +60,7 @@ public class ServerChunkDataPacket extends Packet {
             int z = packetBuffer.readInt();
             this.biome = packetBuffer.readBoolean();
 
-            short bitmask = packetBuffer.readShort();
+            int bitmask = packetBuffer.readShort() & 65535;
             byte[] data = packetBuffer.readByteArray();
             this.bitmask = bitmask;
 
@@ -190,7 +190,7 @@ public class ServerChunkDataPacket extends Packet {
                 }
             }
 
-            boolean skylight = ((4096 * 2) + 2048) * Integer.bitCount(bitmask) + (biome ? 256 : 0) < data.length;
+            boolean skylight = ((4096 * 2) + 2048) * Integer.bitCount(bitmask & 65535) + (biome ? 256 : 0) < data.length;
             if(skylight) {
                 for(int index = 0;index < 16;index++) {
                     if((bitmask & (1 << index)) == 1) {
