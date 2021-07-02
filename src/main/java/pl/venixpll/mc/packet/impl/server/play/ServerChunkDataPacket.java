@@ -38,39 +38,29 @@ public class ServerChunkDataPacket extends Packet {
 
     @Override
     public void write(PacketBuffer packetBuffer) throws Exception {
-        try {
-            packetBuffer.writeInt(chunkSection.getX());
-            packetBuffer.writeInt(chunkSection.getZ());
-            packetBuffer.writeBoolean(biome);
+        packetBuffer.writeInt(chunkSection.getX());
+        packetBuffer.writeInt(chunkSection.getZ());
+        packetBuffer.writeBoolean(biome);
 
-            WritedChunkSection section = WritedChunkSection.writeChunkSection(chunkSection, isHaveSky, biome);
+        WritedChunkSection section = WritedChunkSection.writeChunkSection(chunkSection, isHaveSky, biome);
 
-            packetBuffer.writeShort(section.getBitmask() & 65535);
-            packetBuffer.writeByteArray(section.getData());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw ex;
-        }
+        packetBuffer.writeShort(section.getBitmask() & 65535);
+        packetBuffer.writeByteArray(section.getData());
     }
 
     @Override
     public void read(PacketBuffer packetBuffer) throws Exception {
-        try {
-            int x = packetBuffer.readInt();
-            int z = packetBuffer.readInt();
-            this.biome = packetBuffer.readBoolean();
+        int x = packetBuffer.readInt();
+        int z = packetBuffer.readInt();
+        this.biome = packetBuffer.readBoolean();
 
-            int bitmask = packetBuffer.readShort() & 65535;
-            byte[] data = packetBuffer.readByteArray();
-            this.bitmask = bitmask;
+        int bitmask = packetBuffer.readShort() & 65535;
+        byte[] data = packetBuffer.readByteArray();
+        this.bitmask = bitmask;
 
-            ReadedChunkSection readedChunkSection = ReadedChunkSection.readChunkSection(data, bitmask, x, z, biome);
-            chunkSection = readedChunkSection.getChunkSection();
-            isHaveSky = readedChunkSection.skylight;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw ex;
-        }
+        ReadedChunkSection readedChunkSection = ReadedChunkSection.readChunkSection(data, bitmask, x, z, biome);
+        chunkSection = readedChunkSection.getChunkSection();
+        isHaveSky = readedChunkSection.skylight;
     }
 
     @Override
@@ -79,6 +69,7 @@ public class ServerChunkDataPacket extends Packet {
                 "chunkSection=" + chunkSection +
                 ", biome=" + biome +
                 ", isHaveSky=" + isHaveSky +
+                ", bitmask=" + bitmask +
                 '}';
     }
 
@@ -107,7 +98,7 @@ public class ServerChunkDataPacket extends Packet {
 
             for(i = 0;i < chunks.length;i++) {
                 Chunk chunk = chunks[i];
-                if(chunk != null && (!chunk.isEmpty())) {
+                if(chunk != null) {
                     mask |= 1 << i;
                 }
             }
@@ -117,7 +108,7 @@ public class ServerChunkDataPacket extends Packet {
 
             for(i = 0;i < chunks.length;i++) {
                 Chunk chunk = chunks[i];
-                if(chunk != null && (!chunk.isEmpty())) {
+                if(chunk != null) {
                     pos += chunk.getBlocks().getData().length * 2;
                     buffer.put(chunk.getBlocks().getData(), 0, chunk.getBlocks().getData().length);
                     buffer.position(pos / 2);
@@ -126,7 +117,7 @@ public class ServerChunkDataPacket extends Packet {
 
             for(i = 0;i < chunks.length;i++) {
                 Chunk chunk = chunks[i];
-                if(chunk != null && (!chunk.isEmpty())) {
+                if(chunk != null) {
                     byte[] blocklight = chunk.getBlocklight().getData();
                     System.arraycopy(blocklight, 0, data, pos, blocklight.length);
                     pos += blocklight.length;
@@ -137,7 +128,7 @@ public class ServerChunkDataPacket extends Packet {
             if(skylight) {
                 for (i = 0; i < chunks.length; i++) {
                     Chunk chunk = chunks[i];
-                    if(chunk != null && (!chunk.isEmpty())) {
+                    if(chunk != null) {
                         byte[] skylightArray = chunk.getSkylight().getData();
                         System.arraycopy(skylightArray, 0, data, pos, skylightArray.length);
                         pos += skylightArray.length;
@@ -160,43 +151,46 @@ public class ServerChunkDataPacket extends Packet {
     public static class ReadedChunkSection {
         private ChunkSection chunkSection;
         private int bitmask;
-        private int x,z;
+        private int x, z;
         private boolean skylight;
 
-        public static ReadedChunkSection readChunkSection(byte[] data,int bitmask,int x,int z,boolean biome) {
+        public static ReadedChunkSection readChunkSection(byte[] data, int bitmask, int x, int z, boolean biome) {
             Chunk[] chunks = new Chunk[16];
             ShortBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
             int pos = 0;
 
-            for(int index = 0;index < 16;index++) {
-                if((bitmask & 1 << index) != 0) {
+            for (int index = 0; index < 16; index++) {
+                if ((bitmask & 1 << index) != 0) {
                     Chunk chunk = new Chunk();
                     chunk.setY(index);
                     ShortArray3d shortArray3d = chunk.getBlocks();
-                    buffer.get(shortArray3d.getData(),0,shortArray3d.getData().length);
+                    buffer.get(shortArray3d.getData(), 0, shortArray3d.getData().length);
                     pos += shortArray3d.getData().length * 2;
                     chunk.setBlocks(shortArray3d);
                     chunks[index] = chunk;
+                } else if (biome && chunks[index] != null) {
+                    chunks[index] = null;
                 }
             }
 
-            for(int index = 0;index < 16;index++) {
-                if ((bitmask & (1 << index)) == 1) {
+            for (int index = 0; index < 16; index++) {
+                if ((bitmask & 1 << index) != 1 && chunks[index] != null) {
                     Chunk chunk = chunks[index];
-                    byte[] array = chunk.getBlocklight().getData();
+                    byte[] array = new byte[2048];
                     System.arraycopy(data, pos, array, 0, array.length);
                     pos += array.length;
                     chunk.setBlocklight(new NibbleArray3d(array));
                 }
             }
 
+
             boolean skylight = ((4096 * 2) + 2048) * Integer.bitCount(bitmask & 65535) + (biome ? 256 : 0) < data.length;
-            if(skylight) {
-                for(int index = 0;index < 16;index++) {
-                    if((bitmask & (1 << index)) == 1) {
+            if (skylight) {
+                for (int index = 0; index < 16; index++) {
+                    if ((bitmask & 1 << index) != 1 && chunks[index] != null) {
                         Chunk chunk = chunks[index];
                         byte[] array = new byte[2048];
-                        System.arraycopy(data,pos,array,0,array.length);
+                        System.arraycopy(data, pos, array, 0, array.length);
                         pos += array.length;
                         chunk.setSkylight(new NibbleArray3d(array));
                     }
@@ -204,14 +198,14 @@ public class ServerChunkDataPacket extends Packet {
             }
 
             byte[] biomeData = null;
-            if(biome) {
+            if (biome) {
                 biomeData = new byte[256];
-                if(data.length - pos >= 256) {
+                if (data.length - pos >= 256) {
                     System.arraycopy(data, pos, biomeData, 0, biomeData.length);
                 }
             }
-
-            return new ReadedChunkSection(new ChunkSection(x,z,chunks,biomeData),bitmask,x,z,skylight);
+            System.out.println(data.length - pos + " bytes " + data.length + " bitmask:" + Integer.bitCount(bitmask & 65535) + "\n");
+            return new ReadedChunkSection(new ChunkSection(x, z, chunks, biomeData), bitmask, x, z, skylight);
         }
     }
 
