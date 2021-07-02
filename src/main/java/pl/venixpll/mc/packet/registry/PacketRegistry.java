@@ -114,7 +114,7 @@ public class PacketRegistry {
         registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.CLIENTBOUND, new ServerChatPacket());
         registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.CLIENTBOUND, new ServerChunkDataPacket());
         registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.CLIENTBOUND, new ServerMapChunkBulkPacket());
-        registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.CLIENTBOUND, new ServerMultiBlockChange());
+        //registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.CLIENTBOUND, new ServerMultiBlockChange());
         registerPacket(EnumConnectionState.PLAY, EnumPacketDirection.CLIENTBOUND, new ServerBlockChange());
     }
 

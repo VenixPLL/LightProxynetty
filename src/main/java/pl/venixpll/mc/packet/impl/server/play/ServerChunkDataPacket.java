@@ -174,7 +174,7 @@ public class ServerChunkDataPacket extends Packet {
             }
 
             for (int index = 0; index < 16; index++) {
-                if ((bitmask & 1 << index) != 1 && chunks[index] != null) {
+                if ((bitmask & 1 << index) != 0 && chunks[index] != null) {
                     Chunk chunk = chunks[index];
                     byte[] array = new byte[2048];
                     System.arraycopy(data, pos, array, 0, array.length);
@@ -187,7 +187,7 @@ public class ServerChunkDataPacket extends Packet {
             boolean skylight = ((4096 * 2) + 2048) * Integer.bitCount(bitmask & 65535) + (biome ? 256 : 0) < data.length;
             if (skylight) {
                 for (int index = 0; index < 16; index++) {
-                    if ((bitmask & 1 << index) != 1 && chunks[index] != null) {
+                    if ((bitmask & 1 << index) != 0 && chunks[index] != null) {
                         Chunk chunk = chunks[index];
                         byte[] array = new byte[2048];
                         System.arraycopy(data, pos, array, 0, array.length);
